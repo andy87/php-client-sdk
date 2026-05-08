@@ -78,6 +78,8 @@ class DefaultRequestFactory implements RequestFactoryInterface
             rawBody: $encodedBody->content,
             metadata: [
                 'queryString' => $queryString,
+                'promptClass' => $prompt::class,
+                'endpoint' => $prompt->getEndpoint(),
             ],
         );
     }

@@ -174,6 +174,7 @@ Configurable parts:
 
 - `timeout`, `headers`, `events`;
 - `strictValidation`;
+- `validatePrompt`;
 - `retryPolicy`;
 - `queryEncoder`;
 - `bodyEncoder`;
@@ -182,6 +183,21 @@ Configurable parts:
 - `requestFactory`.
 
 Retry is disabled by default. Use `DefaultRetryPolicy` only when repeated requests are safe for the target API operation.
+
+`validatePrompt` controls local prompt validation before a request is built. It is enabled by default. Set it to `false` only in mock or test environments where a client must return success fixtures for incomplete input:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Andy87\ClientsBase\Config\ClientOptions;
+
+$options = new ClientOptions(
+    strictValidation: true,
+    validatePrompt: false,
+);
+```
 
 ## Runtime Events and Headers
 
@@ -309,6 +325,45 @@ final class CustomTransport implements HttpTransportInterface
     }
 }
 ```
+
+## Mock Transport
+
+`MockTransport` returns configured `HttpResponse` fixtures and never falls back to real network requests. Use it for test stands where a client must return successful API-shaped data without calling the external service.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Andy87\ClientsBase\Auth\NullAuthorizationStrategy;
+use Andy87\ClientsBase\Config\ClientOptions;
+use Andy87\ClientsBase\Mock\MockTransport;
+use Andy87\ClientsBase\Mock\RouteMockResponseResolver;
+
+$resolver = (new RouteMockResponseResolver())
+    ->addJson('GET', '/users/{id}', [
+        'id' => 123,
+        'name' => 'Mock User',
+    ]);
+
+$provider = new UsersProvider(
+    baseUrl: 'https://api.example.com',
+    authorizationStrategy: new NullAuthorizationStrategy(),
+    transport: new MockTransport($resolver),
+    options: new ClientOptions(validatePrompt: false),
+);
+```
+
+Routes match by HTTP method and absolute URL, path or endpoint template stored in request metadata. OAuth token requests can be mocked by absolute token URL:
+
+```php
+$resolver->addJson('POST', 'https://auth.example.com/oauth/token', [
+    'access_token' => 'mock-token',
+    'expires_in' => 3600,
+]);
+```
+
+`validatePrompt=false` disables only `Prompt::validate()`. Request building can still fail when a prompt cannot provide a method, endpoint or required path placeholder.
 
 ## Error Handling
 

@@ -174,6 +174,7 @@ echo $response->getStatusCode();
 
 - `timeout`, `headers`, `events`;
 - `strictValidation`;
+- `validatePrompt`;
 - `retryPolicy`;
 - `queryEncoder`;
 - `bodyEncoder`;
@@ -182,6 +183,21 @@ echo $response->getStatusCode();
 - `requestFactory`.
 
 Повторы запросов выключены по умолчанию. Используйте `DefaultRetryPolicy` только для API-операций, где повтор безопасен.
+
+`validatePrompt` управляет локальной валидацией prompt перед сборкой запроса. По умолчанию опция включена. Устанавливайте `false` только в mock или test окружениях, где клиент должен возвращать успешные fixture-ответы даже при неполном входе:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Andy87\ClientsBase\Config\ClientOptions;
+
+$options = new ClientOptions(
+    strictValidation: true,
+    validatePrompt: false,
+);
+```
 
 ## Runtime-события и заголовки
 
@@ -309,6 +325,45 @@ final class CustomTransport implements HttpTransportInterface
     }
 }
 ```
+
+## Mock-транспорт
+
+`MockTransport` возвращает настроенные fixture-ответы `HttpResponse` и никогда не переключается на реальные сетевые запросы. Используйте его для тестовых стендов, где клиент должен возвращать успешные данные в формате API без обращения к внешнему сервису.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Andy87\ClientsBase\Auth\NullAuthorizationStrategy;
+use Andy87\ClientsBase\Config\ClientOptions;
+use Andy87\ClientsBase\Mock\MockTransport;
+use Andy87\ClientsBase\Mock\RouteMockResponseResolver;
+
+$resolver = (new RouteMockResponseResolver())
+    ->addJson('GET', '/users/{id}', [
+        'id' => 123,
+        'name' => 'Mock User',
+    ]);
+
+$provider = new UsersProvider(
+    baseUrl: 'https://api.example.com',
+    authorizationStrategy: new NullAuthorizationStrategy(),
+    transport: new MockTransport($resolver),
+    options: new ClientOptions(validatePrompt: false),
+);
+```
+
+Route сопоставляется по HTTP-методу и абсолютному URL, path или endpoint-шаблону из metadata запроса. OAuth token request можно замокать по абсолютному token URL:
+
+```php
+$resolver->addJson('POST', 'https://auth.example.com/oauth/token', [
+    'access_token' => 'mock-token',
+    'expires_in' => 3600,
+]);
+```
+
+`validatePrompt=false` отключает только `Prompt::validate()`. Сборка запроса всё ещё может упасть, если prompt не может вернуть method, endpoint или обязательный path-плейсхолдер.
 
 ## Обработка ошибок
 

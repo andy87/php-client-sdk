@@ -39,6 +39,7 @@ class ClientOptions
      * @param ApiErrorFactoryInterface|null $errorFactory Фабрика ошибок API.
      * @param RequestFactoryInterface|null $requestFactory Фабрика HTTP-запросов.
      * @param RequestFinalizerInterface|null $requestFinalizer Финализатор HTTP-запроса.
+     * @param bool $validatePrompt Проверять обязательные поля Prompt DTO перед запросом.
      *
      * @return void
      */
@@ -54,6 +55,7 @@ class ClientOptions
         public ?ApiErrorFactoryInterface $errorFactory = null,
         public ?RequestFactoryInterface $requestFactory = null,
         public ?RequestFinalizerInterface $requestFinalizer = null,
+        public bool $validatePrompt = true,
     ) {
         $this->headers = HeaderUtils::merge([], $this->headers);
         $this->retryPolicy ??= new NoRetryPolicy();

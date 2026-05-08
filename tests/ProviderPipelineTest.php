@@ -11,6 +11,8 @@ use Andy87\ClientsBase\Config\ClientOptions;
 use Andy87\ClientsBase\Dto\ApiError;
 use Andy87\ClientsBase\Exception\AuthorizationException;
 use Andy87\ClientsBase\Exception\ResponseDecodeException;
+use Andy87\ClientsBase\Exception\ResponseHydrationException;
+use Andy87\ClientsBase\Exception\TransportException;
 use Andy87\ClientsBase\Exception\ValidationException;
 use Andy87\ClientsBase\Encoder\DefaultBodyEncoder;
 use Andy87\ClientsBase\Encoder\MultipartBodyEncoder;
@@ -19,6 +21,10 @@ use Andy87\ClientsBase\Http\MultipartFile;
 use Andy87\ClientsBase\Http\HttpResponse;
 use Andy87\ClientsBase\Http\HttpRequest;
 use Andy87\ClientsBase\Http\NativeHttpTransport;
+use Andy87\ClientsBase\Mock\CallbackMockResponseResolver;
+use Andy87\ClientsBase\Mock\CompositeMockResponseResolver;
+use Andy87\ClientsBase\Mock\MockTransport;
+use Andy87\ClientsBase\Mock\RouteMockResponseResolver;
 use Andy87\ClientsBase\Prompt\AbstractPrompt;
 use Andy87\ClientsBase\Request\DefaultRequestFactory;
 use Andy87\ClientsBase\Response\AbstractResponse;
@@ -60,6 +66,132 @@ class ProviderPipelineTest extends TestCase
         self::assertSame('https://api.example.test/users/10', $transport->requests[0]->url);
         self::assertSame(['include_posts' => true], $transport->requests[0]->query);
         self::assertSame('include_posts=1', $transport->requests[0]->metadata['queryString']);
+        self::assertSame(GetUserPrompt::class, $transport->requests[0]->metadata['promptClass']);
+        self::assertSame('/users/{id}', $transport->requests[0]->metadata['endpoint']);
+    }
+
+    /**
+     * Проверяет, что Prompt DTO валидируется по умолчанию.
+     *
+     * @return void
+     */
+    public function testPromptValidationIsEnabledByDefault(): void
+    {
+        $transport = new FakeTransport([new HttpResponse(200, [], '{"id":1}')]);
+        $provider = new TestProvider('https://api.example.test', new NullAuthorizationStrategy(), $transport);
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $provider->call(new CreateUserPrompt(), UserResponse::class);
+    }
+
+    /**
+     * Проверяет, что validatePrompt=false отключает вызов Prompt::validate().
+     *
+     * @return void
+     */
+    public function testPromptValidationCanBeDisabled(): void
+    {
+        $resolver = (new RouteMockResponseResolver())->addJson('POST', '/users', ['id' => 15, 'name' => 'Mock']);
+        $provider = new TestProvider(
+            'https://api.example.test',
+            new NullAuthorizationStrategy(),
+            new MockTransport($resolver),
+            options: new ClientOptions(validatePrompt: false),
+        );
+
+        /** @var UserResponse $response */
+        $response = $provider->call(new CreateUserPrompt(), UserResponse::class);
+
+        self::assertSame(15, $response->id);
+        self::assertSame('Mock', $response->name);
+        self::assertSame('1', $response->getHeaders()['X-Mock-Response']);
+    }
+
+    /**
+     * Проверяет, что mock-route может совпадать с endpoint-шаблоном из metadata.
+     *
+     * @return void
+     */
+    public function testMockRouteCanMatchEndpointTemplate(): void
+    {
+        $resolver = (new RouteMockResponseResolver())->addJson('get', '/users/{id}', ['id' => 10, 'name' => 'Template']);
+        $provider = new TestProvider(
+            'https://api.example.test',
+            new NullAuthorizationStrategy(),
+            new MockTransport($resolver),
+        );
+
+        /** @var UserResponse $response */
+        $response = $provider->call(new GetUserPrompt(['id' => 10]), UserResponse::class);
+
+        self::assertSame(10, $response->id);
+        self::assertSame('Template', $response->name);
+    }
+
+    /**
+     * Проверяет, что mock-transport не делает fallback и падает при неизвестном route.
+     *
+     * @return void
+     */
+    public function testMockTransportThrowsWhenRouteIsMissing(): void
+    {
+        $transport = new MockTransport(new RouteMockResponseResolver());
+        $provider = new TestProvider('https://api.example.test', new NullAuthorizationStrategy(), $transport);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Mock response fixture was not found');
+
+        $provider->call(new GetUserPrompt(['id' => 10]), UserResponse::class);
+    }
+
+    /**
+     * Проверяет, что strictValidation=true валит неполный успешный mock-ответ.
+     *
+     * @return void
+     */
+    public function testStrictValidationStillRejectsIncompleteMockResponse(): void
+    {
+        $resolver = (new RouteMockResponseResolver())->addJson('GET', '/users/{id}', ['name' => 'No id']);
+        $provider = new TestProvider(
+            'https://api.example.test',
+            new NullAuthorizationStrategy(),
+            new MockTransport($resolver),
+        );
+
+        $this->expectException(ResponseHydrationException::class);
+
+        $provider->call(new GetUserPrompt(['id' => 10]), UserResponse::class);
+    }
+
+    /**
+     * Проверяет callback и composite mock resolver-ы.
+     *
+     * @return void
+     */
+    public function testCompositeMockResolverUsesCallbackFallback(): void
+    {
+        $resolver = new CompositeMockResponseResolver([
+            new RouteMockResponseResolver(),
+            new CallbackMockResponseResolver(static function (HttpRequest $request): ?HttpResponse {
+                if ($request->method !== 'GET') {
+                    return null;
+                }
+
+                return new HttpResponse(200, ['Content-Type' => 'application/json'], '{"id":20,"name":"Callback"}');
+            }),
+        ]);
+        $provider = new TestProvider(
+            'https://api.example.test',
+            new NullAuthorizationStrategy(),
+            new MockTransport($resolver),
+        );
+
+        /** @var UserResponse $response */
+        $response = $provider->call(new GetUserPrompt(['id' => 20]), UserResponse::class);
+
+        self::assertSame(20, $response->id);
+        self::assertSame('Callback', $response->name);
     }
 
     /**
@@ -319,6 +451,25 @@ class ProviderPipelineTest extends TestCase
         self::assertSame(['Authorization' => 'Bearer token'], $headers);
         self::assertSame('grant_type=client_credentials&client_id=client&client_secret=secret', $transport->requests[0]->rawBody);
         self::assertSame('application/x-www-form-urlencoded', $transport->requests[0]->headers['Content-Type']);
+    }
+
+    /**
+     * Проверяет, что OAuth client_credentials может получить токен через mock-route.
+     *
+     * @return void
+     */
+    public function testClientCredentialsAuthorizationCanUseMockTransport(): void
+    {
+        $resolver = (new RouteMockResponseResolver())->addJson(
+            'POST',
+            'https://auth.example.test/token',
+            ['access_token' => 'mock-token', 'expires_in' => 3600],
+        );
+        $authorization = new ClientCredentialsAuthorizationStrategy('https://auth.example.test/token', 'bad', 'bad');
+
+        $headers = $authorization->getAuthorizationHeaders(new MockTransport($resolver));
+
+        self::assertSame(['Authorization' => 'Bearer mock-token'], $headers);
     }
 
     /**

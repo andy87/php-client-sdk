@@ -74,7 +74,9 @@ abstract class AbstractProvider
             throw new \InvalidArgumentException(sprintf('Response class "%s" must implement %s.', $responseClass, ResponseInterface::class));
         }
 
-        $prompt->validate();
+        if ($this->options->validatePrompt) {
+            $prompt->validate();
+        }
 
         $headers = $this->runtime->mergeHeaders(['Accept' => 'application/json'], $this->runtime->getHeaders());
 
