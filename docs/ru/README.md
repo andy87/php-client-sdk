@@ -41,6 +41,8 @@ composer require andy87/clients-sdk
 
 Наследуйте `AbstractPrompt`, чтобы описать запрос. Базовый класс заполняет объявленные свойства из входных данных, проверяет обязательные поля, собирает path/query/body-массивы и нормализует вложенные DTO через `toArray()` или `toValue()`, если такие методы существуют.
 
+Используйте `PublicPrompt` для публичных endpoints и `PrivatePrompt` для приватных endpoints с профилем авторизации. `AbstractPrompt` остаётся универсальным базовым классом для пользовательских схем prompt.
+
 ```php
 <?php
 
@@ -67,6 +69,34 @@ final class GetUserPrompt extends AbstractPrompt
 
     public int $id;
     public ?bool $includePosts = null;
+}
+```
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Andy87\ClientsBase\Prompt\PrivatePrompt;
+use Andy87\ClientsBase\Prompt\PublicPrompt;
+
+/**
+ * Описывает публичный health-check запрос.
+ */
+final class HealthPrompt extends PublicPrompt
+{
+    protected const METHOD = 'GET';
+    protected const ENDPOINT = '/health';
+}
+
+/**
+ * Описывает приватный запрос создания заказа.
+ */
+final class CreateOrderPrompt extends PrivatePrompt
+{
+    protected const METHOD = 'POST';
+    protected const ENDPOINT = '/orders';
+    protected const AUTHORIZATION_PROFILE = 'orders-api';
 }
 ```
 
@@ -312,12 +342,23 @@ protected const AUTHORIZATION_REQUIRED = false;
 declare(strict_types=1);
 
 use Andy87\ClientsBase\Auth\ApiKeyAuthorizationStrategy;
+use Andy87\ClientsBase\Auth\AuthorizationProfileStrategyResolver;
 use Andy87\ClientsBase\Auth\PromptClassAuthorizationStrategyResolver;
 use Andy87\ClientsBase\Config\ClientOptions;
 
 $options = new ClientOptions(
     authorizationResolver: new PromptClassAuthorizationStrategyResolver([
         GetUserPrompt::class => new ApiKeyAuthorizationStrategy('X-Api-Key', 'secret'),
+    ]),
+);
+```
+
+Для наследников `PrivatePrompt` предпочитайте имена профилей вроде `default`, `avito-client-credentials`, `api-key` или `sandbox-token`:
+
+```php
+$options = new ClientOptions(
+    authorizationResolver: new AuthorizationProfileStrategyResolver([
+        'orders-api' => new ApiKeyAuthorizationStrategy('X-Api-Key', 'secret'),
     ]),
 );
 ```
