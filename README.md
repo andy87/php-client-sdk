@@ -338,6 +338,7 @@ declare(strict_types=1);
 use Andy87\ClientsBase\Auth\NullAuthorizationStrategy;
 use Andy87\ClientsBase\Config\ClientOptions;
 use Andy87\ClientsBase\Mock\MockTransport;
+use Andy87\ClientsBase\Mock\PromptClassMockResponseResolver;
 use Andy87\ClientsBase\Mock\RouteMockResponseResolver;
 
 $resolver = (new RouteMockResponseResolver())
@@ -364,6 +365,52 @@ $resolver->addJson('POST', 'https://auth.example.com/oauth/token', [
 ```
 
 `validatePrompt=false` disables only `Prompt::validate()`. Request building can still fail when a prompt cannot provide a method, endpoint or required path placeholder.
+
+If route paths are unstable or generated, use `PromptClassMockResponseResolver` to bind fixtures to Prompt DTO classes:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Andy87\ClientsBase\Mock\MockTransport;
+use Andy87\ClientsBase\Mock\PromptClassMockResponseResolver;
+
+$resolver = (new PromptClassMockResponseResolver())
+    ->addJson(GetUserPrompt::class, [
+        'id' => 123,
+        'name' => 'Mock User',
+    ]);
+
+$provider = new UsersProvider(
+    baseUrl: 'https://api.example.com',
+    authorizationStrategy: new NullAuthorizationStrategy(),
+    transport: new MockTransport($resolver),
+);
+```
+
+## Traceable Transport
+
+`TraceableTransport` wraps any `HttpTransportInterface` and records requests, responses, exceptions and duration without changing transport behavior.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Andy87\ClientsBase\Http\NativeHttpTransport;
+use Andy87\ClientsBase\Http\TraceableTransport;
+
+$transport = new TraceableTransport(new NativeHttpTransport());
+$provider = new UsersProvider(
+    baseUrl: 'https://api.example.com',
+    authorizationStrategy: new NullAuthorizationStrategy(),
+    transport: $transport,
+);
+
+$response = $provider->getUser(123);
+$lastRecord = $transport->getLastRecord();
+```
 
 ## Error Handling
 
