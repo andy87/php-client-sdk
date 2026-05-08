@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Andy87\ClientsBase\Tests;
 
 use Andy87\ClientsBase\Config\ClientOptions;
+use Andy87\ClientsBase\Config\BaseUrl;
 use Andy87\ClientsBase\Decoder\JsonResponseDecoder;
 use Andy87\ClientsBase\Encoder\DefaultBodyEncoder;
 use Andy87\ClientsBase\Encoder\DefaultQueryEncoder;
@@ -37,6 +38,8 @@ class ClientOptionsTest extends TestCase
         self::assertInstanceOf(DefaultApiErrorFactory::class, $options->errorFactory);
         self::assertInstanceOf(DefaultRequestFactory::class, $options->requestFactory);
         self::assertInstanceOf(DefaultRequestFinalizer::class, $options->requestFinalizer);
+        self::assertNull($options->authorizationResolver);
+        self::assertSame([401], $options->refreshAuthorizationStatusCodes);
     }
 
     /**
@@ -49,5 +52,22 @@ class ClientOptionsTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         new ClientOptions(headers: ['X-Test' => "ok\r\nX-Injected: 1"]);
+    }
+
+    /**
+     * Проверяет сборку базового URL из protocol, host, port и prefix.
+     *
+     * @return void
+     */
+    public function testBaseUrlBuildsStringFromParts(): void
+    {
+        $baseUrl = new BaseUrl(
+            host: 'api.example.test',
+            protocol: 'https',
+            prefix: '/api/v1/',
+            port: 8443,
+        );
+
+        self::assertSame('https://api.example.test:8443/api/v1', (string) $baseUrl);
     }
 }

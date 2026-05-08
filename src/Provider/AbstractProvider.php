@@ -9,6 +9,7 @@ use Andy87\ClientsBase\Contracts\AuthorizationQueryStrategyInterface;
 use Andy87\ClientsBase\Contracts\AuthorizationStrategyInterface;
 use Andy87\ClientsBase\Contracts\HttpTransportInterface;
 use Andy87\ClientsBase\Contracts\PromptInterface;
+use Andy87\ClientsBase\Contracts\RefreshableAuthorizationStrategyInterface;
 use Andy87\ClientsBase\Contracts\ResponseInterface;
 use Andy87\ClientsBase\Event\AfterRequestEvent;
 use Andy87\ClientsBase\Event\BeforeRequestEvent;
@@ -30,10 +31,13 @@ abstract class AbstractProvider
     /** @var ClientOptions Настройки выполнения запросов. */
     protected ClientOptions $options;
 
+    /** @var string Базовый URL API. */
+    protected string $baseUrl;
+
     /**
      * Создаёт provider.
      *
-     * @param string $baseUrl Базовый URL API.
+     * @param string|\Stringable $baseUrl Базовый URL API.
      * @param AuthorizationStrategyInterface $authorizationStrategy Стратегия авторизации.
      * @param HttpTransportInterface $transport HTTP-транспорт.
      * @param int $timeout Таймаут запросов.
@@ -43,13 +47,14 @@ abstract class AbstractProvider
      * @return void
      */
     public function __construct(
-        protected string $baseUrl,
+        string|\Stringable $baseUrl,
         protected AuthorizationStrategyInterface $authorizationStrategy,
         protected HttpTransportInterface $transport,
         protected int $timeout = 30,
         ?ClientRuntime $runtime = null,
         ?ClientOptions $options = null,
     ) {
+        $this->baseUrl = (string) $baseUrl;
         $this->options = $options ?? new ClientOptions(timeout: $timeout);
         $this->timeout = $this->options->timeout;
         $this->runtime = $runtime ?? new ClientRuntime($this->options->headers, $this->options->events);
@@ -78,31 +83,17 @@ abstract class AbstractProvider
             $prompt->validate();
         }
 
-        $headers = $this->runtime->mergeHeaders(['Accept' => 'application/json'], $this->runtime->getHeaders());
-
-        $extraQuery = [];
-
-        if ($prompt->requiresAuthorization()) {
-            $headers = $this->runtime->mergeHeaders($headers, $this->authorizationStrategy->getAuthorizationHeaders($this->transport));
-
-            if ($this->authorizationStrategy instanceof AuthorizationQueryStrategyInterface) {
-                $extraQuery = $this->authorizationStrategy->getAuthorizationQueryParameters($this->transport);
-            }
-        }
-
-        $httpRequest = $this->options->requestFactory->create(
-            prompt: $prompt,
-            baseUrl: $this->baseUrl,
-            headers: $headers,
-            timeout: $this->timeout,
-            extraQuery: $extraQuery,
-        );
+        $authorizationStrategy = $this->resolveAuthorizationStrategy($prompt);
+        $httpRequest = $this->createHttpRequest($prompt, $authorizationStrategy);
 
         $this->runtime->dispatch(ClientEvents::BEFORE_REQUEST, new BeforeRequestEvent($this, $prompt, $httpRequest));
         $httpRequest = $this->options->requestFinalizer->finalize($httpRequest);
 
         try {
             $httpResponse = $this->sendWithRetry($httpRequest);
+            $httpRequest = $this->refreshAuthorizationAndRetryOnce($prompt, $authorizationStrategy, $httpRequest, $httpResponse);
+            /** @var HttpResponse $httpResponse */
+            $httpResponse = $httpRequest->metadata['lastHttpResponse'];
             $data = $this->options->responseDecoder->decode($httpResponse);
             $error = $httpResponse->statusCode >= 400 ? $this->options->errorFactory->create($httpResponse, $data) : null;
 
@@ -117,6 +108,7 @@ abstract class AbstractProvider
                     $httpRequest,
                     $this->options->strictValidation,
                 );
+            /** @phpstan-ignore-next-line Response DTO constructors can validate runtime payloads and throw. */
             } catch (\Throwable $exception) {
                 throw new ResponseHydrationException(
                     sprintf('Response DTO "%s" hydration failed: %s', $responseClass, $exception->getMessage()),
@@ -133,6 +125,92 @@ abstract class AbstractProvider
         $this->runtime->dispatch(ClientEvents::AFTER_REQUEST, new AfterRequestEvent($this, $prompt, $httpRequest, $httpResponse, $response));
 
         return $response;
+    }
+
+    /**
+     * Собирает HTTP-запрос с учётом авторизации.
+     *
+     * @param PromptInterface $prompt DTO запроса.
+     * @param AuthorizationStrategyInterface $authorizationStrategy Стратегия авторизации.
+     *
+     * @return HttpRequest HTTP-запрос.
+     */
+    private function createHttpRequest(
+        PromptInterface $prompt,
+        AuthorizationStrategyInterface $authorizationStrategy,
+    ): HttpRequest {
+        $headers = $this->runtime->mergeHeaders(['Accept' => 'application/json'], $this->runtime->getHeaders());
+        $extraQuery = [];
+
+        if ($prompt->requiresAuthorization()) {
+            $headers = $this->runtime->mergeHeaders($headers, $authorizationStrategy->getAuthorizationHeaders($this->transport));
+
+            if ($authorizationStrategy instanceof AuthorizationQueryStrategyInterface) {
+                $extraQuery = $authorizationStrategy->getAuthorizationQueryParameters($this->transport);
+            }
+        }
+
+        return $this->options->requestFactory->create(
+            prompt: $prompt,
+            baseUrl: $this->baseUrl,
+            headers: $headers,
+            timeout: $this->timeout,
+            extraQuery: $extraQuery,
+        );
+    }
+
+    /**
+     * Выбирает стратегию авторизации для Prompt DTO.
+     *
+     * @param PromptInterface $prompt DTO запроса.
+     *
+     * @return AuthorizationStrategyInterface Стратегия авторизации.
+     */
+    private function resolveAuthorizationStrategy(PromptInterface $prompt): AuthorizationStrategyInterface
+    {
+        return $this->options->authorizationResolver?->resolve($prompt, $this->authorizationStrategy)
+            ?? $this->authorizationStrategy;
+    }
+
+    /**
+     * Обновляет авторизацию по настраиваемому HTTP-статусу и повторяет запрос один раз.
+     *
+     * @param PromptInterface $prompt DTO запроса.
+     * @param AuthorizationStrategyInterface $authorizationStrategy Стратегия авторизации.
+     * @param HttpRequest $httpRequest Исходный HTTP-запрос.
+     * @param HttpResponse $httpResponse Исходный HTTP-ответ.
+     *
+     * @return HttpRequest Финальный HTTP-запрос с lastHttpResponse в metadata.
+     */
+    private function refreshAuthorizationAndRetryOnce(
+        PromptInterface $prompt,
+        AuthorizationStrategyInterface $authorizationStrategy,
+        HttpRequest $httpRequest,
+        HttpResponse $httpResponse,
+    ): HttpRequest {
+        $httpRequest->metadata['lastHttpResponse'] = $httpResponse;
+
+        if (!$prompt->requiresAuthorization()) {
+            return $httpRequest;
+        }
+
+        if (!$authorizationStrategy instanceof RefreshableAuthorizationStrategyInterface) {
+            return $httpRequest;
+        }
+
+        if (!in_array($httpResponse->statusCode, $this->options->refreshAuthorizationStatusCodes, true)) {
+            return $httpRequest;
+        }
+
+        $authorizationStrategy->refreshAuthorization($this->transport);
+
+        $nextRequest = $this->createHttpRequest($prompt, $authorizationStrategy);
+        $nextRequest->metadata['authorizationRefreshed'] = true;
+        $this->runtime->dispatch(ClientEvents::BEFORE_REQUEST, new BeforeRequestEvent($this, $prompt, $nextRequest));
+        $nextRequest = $this->options->requestFinalizer->finalize($nextRequest);
+        $nextRequest->metadata['lastHttpResponse'] = $this->sendWithRetry($nextRequest);
+
+        return $nextRequest;
     }
 
     /**

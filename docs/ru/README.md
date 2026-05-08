@@ -181,6 +181,8 @@ echo $response->getStatusCode();
 - `responseDecoder`;
 - `errorFactory`;
 - `requestFactory`.
+- `authorizationResolver`;
+- `refreshAuthorizationStatusCodes`.
 
 Повторы запросов выключены по умолчанию. Используйте `DefaultRetryPolicy` только для API-операций, где повтор безопасен.
 
@@ -196,6 +198,24 @@ use Andy87\ClientsBase\Config\ClientOptions;
 $options = new ClientOptions(
     strictValidation: true,
     validatePrompt: false,
+);
+```
+
+`refreshAuthorizationStatusCodes` по умолчанию равен `[401]`. Если выбранная стратегия авторизации реализует `RefreshableAuthorizationStrategyInterface`, provider обновляет авторизацию и один раз повторяет запрос после этих статусов. Передайте пустой список, чтобы отключить это поведение.
+
+Используйте `BaseUrl`, когда клиенту нужно отдельно настроить protocol, host, port и prefix:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Andy87\ClientsBase\Config\BaseUrl;
+
+$baseUrl = new BaseUrl(
+    host: 'api.example.com',
+    protocol: 'https',
+    prefix: 'api/v1',
 );
 ```
 
@@ -269,6 +289,8 @@ $authorization = new ClientCredentialsAuthorizationStrategy(
 );
 ```
 
+`ClientCredentialsAuthorizationStrategy` обновляет cached token, если provider получил настроенный refresh status, по умолчанию `401`, и после этого provider один раз повторяет исходный запрос.
+
 Другие встроенные стратегии:
 
 - `BearerTokenAuthorizationStrategy` для статического Bearer token;
@@ -280,6 +302,24 @@ $authorization = new ClientCredentialsAuthorizationStrategy(
 
 ```php
 protected const AUTHORIZATION_REQUIRED = false;
+```
+
+Используйте authorization resolver, если разным операциям нужны разные стратегии авторизации:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Andy87\ClientsBase\Auth\ApiKeyAuthorizationStrategy;
+use Andy87\ClientsBase\Auth\PromptClassAuthorizationStrategyResolver;
+use Andy87\ClientsBase\Config\ClientOptions;
+
+$options = new ClientOptions(
+    authorizationResolver: new PromptClassAuthorizationStrategyResolver([
+        GetUserPrompt::class => new ApiKeyAuthorizationStrategy('X-Api-Key', 'secret'),
+    ]),
+);
 ```
 
 ## HTTP-транспорт
@@ -400,6 +440,7 @@ declare(strict_types=1);
 
 use Andy87\ClientsBase\Http\NativeHttpTransport;
 use Andy87\ClientsBase\Http\TraceableTransport;
+use Andy87\ClientsBase\Auth\NullAuthorizationStrategy;
 
 $transport = new TraceableTransport(new NativeHttpTransport());
 $provider = new UsersProvider(
@@ -410,6 +451,13 @@ $provider = new UsersProvider(
 
 $response = $provider->getUser(123);
 $lastRecord = $transport->getLastRecord();
+```
+
+Response DTO также может хранить локальные диагностические заметки:
+
+```php
+$response->addDiagnostic(['source' => 'fixture', 'case' => 'empty-list']);
+$diagnostics = $response->getDiagnostics();
 ```
 
 ## Обработка ошибок

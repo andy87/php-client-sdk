@@ -79,7 +79,7 @@ class NativeHttpTransport implements HttpTransportInterface
             throw new TransportException($error['message'] ?? 'HTTP request failed.');
         }
 
-        [$statusCode, $responseHeaders] = $this->parseResponseHeaders($http_response_header ?? []);
+        [$statusCode, $responseHeaders] = $this->parseResponseHeaders($http_response_header);
 
         return new HttpResponse($statusCode, $responseHeaders, $responseBody);
     }

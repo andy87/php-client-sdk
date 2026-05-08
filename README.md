@@ -181,6 +181,8 @@ Configurable parts:
 - `responseDecoder`;
 - `errorFactory`;
 - `requestFactory`.
+- `authorizationResolver`;
+- `refreshAuthorizationStatusCodes`.
 
 Retry is disabled by default. Use `DefaultRetryPolicy` only when repeated requests are safe for the target API operation.
 
@@ -196,6 +198,24 @@ use Andy87\ClientsBase\Config\ClientOptions;
 $options = new ClientOptions(
     strictValidation: true,
     validatePrompt: false,
+);
+```
+
+`refreshAuthorizationStatusCodes` defaults to `[401]`. If the selected authorization strategy implements `RefreshableAuthorizationStrategyInterface`, the provider refreshes authorization and retries the request once after these statuses. Pass an empty list to disable this behavior.
+
+Use `BaseUrl` when a client wants to configure protocol, host, port and path prefix separately:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Andy87\ClientsBase\Config\BaseUrl;
+
+$baseUrl = new BaseUrl(
+    host: 'api.example.com',
+    protocol: 'https',
+    prefix: 'api/v1',
 );
 ```
 
@@ -269,6 +289,8 @@ $authorization = new ClientCredentialsAuthorizationStrategy(
 );
 ```
 
+`ClientCredentialsAuthorizationStrategy` refreshes its cached token when a provider receives a configured refresh status, `401` by default, and then the provider retries the original request once.
+
 Other built-in strategies:
 
 - `BearerTokenAuthorizationStrategy` for a static Bearer token;
@@ -280,6 +302,24 @@ Prompts require authorization by default. Override the prompt constant when a re
 
 ```php
 protected const AUTHORIZATION_REQUIRED = false;
+```
+
+Use an authorization resolver when different operations require different authorization strategies:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Andy87\ClientsBase\Auth\ApiKeyAuthorizationStrategy;
+use Andy87\ClientsBase\Auth\PromptClassAuthorizationStrategyResolver;
+use Andy87\ClientsBase\Config\ClientOptions;
+
+$options = new ClientOptions(
+    authorizationResolver: new PromptClassAuthorizationStrategyResolver([
+        GetUserPrompt::class => new ApiKeyAuthorizationStrategy('X-Api-Key', 'secret'),
+    ]),
+);
 ```
 
 ## HTTP Transport
@@ -400,6 +440,7 @@ declare(strict_types=1);
 
 use Andy87\ClientsBase\Http\NativeHttpTransport;
 use Andy87\ClientsBase\Http\TraceableTransport;
+use Andy87\ClientsBase\Auth\NullAuthorizationStrategy;
 
 $transport = new TraceableTransport(new NativeHttpTransport());
 $provider = new UsersProvider(
@@ -410,6 +451,13 @@ $provider = new UsersProvider(
 
 $response = $provider->getUser(123);
 $lastRecord = $transport->getLastRecord();
+```
+
+Response DTOs can also store local diagnostic notes:
+
+```php
+$response->addDiagnostic(['source' => 'fixture', 'case' => 'empty-list']);
+$diagnostics = $response->getDiagnostics();
 ```
 
 ## Error Handling

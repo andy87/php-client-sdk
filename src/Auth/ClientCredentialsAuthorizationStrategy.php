@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Andy87\ClientsBase\Auth;
 
-use Andy87\ClientsBase\Contracts\AuthorizationStrategyInterface;
 use Andy87\ClientsBase\Contracts\HttpTransportInterface;
+use Andy87\ClientsBase\Contracts\RefreshableAuthorizationStrategyInterface;
 use Andy87\ClientsBase\Exception\AuthorizationException;
 use Andy87\ClientsBase\Http\HttpRequest;
 
 /**
  * Выполняет OAuth client_credentials авторизацию и кэширует access token в памяти процесса.
  */
-class ClientCredentialsAuthorizationStrategy implements AuthorizationStrategyInterface
+class ClientCredentialsAuthorizationStrategy implements RefreshableAuthorizationStrategyInterface
 {
     private ?string $accessToken = null;
     private int $expiresAt = 0;
@@ -53,6 +53,22 @@ class ClientCredentialsAuthorizationStrategy implements AuthorizationStrategyInt
         }
 
         return ['Authorization' => 'Bearer ' . $this->accessToken];
+    }
+
+    /**
+     * Сбрасывает cached token и запрашивает новый access token.
+     *
+     * @param HttpTransportInterface $transport Транспорт.
+     *
+     * @return void
+     *
+     * @throws AuthorizationException Если API авторизации вернул ошибку.
+     */
+    public function refreshAuthorization(HttpTransportInterface $transport): void
+    {
+        $this->accessToken = null;
+        $this->expiresAt = 0;
+        $this->requestToken($transport);
     }
 
     /**

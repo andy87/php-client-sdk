@@ -7,6 +7,8 @@ namespace Andy87\ClientsBase\Tests;
 use Andy87\ClientsBase\Auth\ApiKeyAuthorizationStrategy;
 use Andy87\ClientsBase\Auth\ClientCredentialsAuthorizationStrategy;
 use Andy87\ClientsBase\Auth\NullAuthorizationStrategy;
+use Andy87\ClientsBase\Auth\PromptClassAuthorizationStrategyResolver;
+use Andy87\ClientsBase\Config\BaseUrl;
 use Andy87\ClientsBase\Config\ClientOptions;
 use Andy87\ClientsBase\Dto\ApiError;
 use Andy87\ClientsBase\Exception\AuthorizationException;
@@ -226,9 +228,11 @@ class ProviderPipelineTest extends TestCase
 
         self::assertTrue($response->hasError());
         self::assertSame(400, $response->getStatusCode());
-        self::assertSame(123, $response->getError()?->code);
-        self::assertSame('Bad request', $response->getError()?->message);
-        self::assertSame('{"error":{"code":123,"message":"Bad request","type":"validation"}}', $response->getError()?->rawBody);
+        $error = $response->getError();
+        self::assertNotNull($error);
+        self::assertSame(123, $error->code);
+        self::assertSame('Bad request', $error->message);
+        self::assertSame('{"error":{"code":123,"message":"Bad request","type":"validation"}}', $error->rawBody);
     }
 
     /**
@@ -324,6 +328,103 @@ class ProviderPipelineTest extends TestCase
         self::assertSame('https://api.example.test/users/1', $transport->requests[0]->url);
         self::assertSame(['api_key' => 'secret'], $transport->requests[0]->query);
         self::assertSame('api_key=secret', $transport->requests[0]->metadata['queryString']);
+    }
+
+    /**
+     * Проверяет выбор стратегии авторизации по классу Prompt DTO.
+     *
+     * @return void
+     */
+    public function testAuthorizationResolverCanOverrideStrategyByPromptClass(): void
+    {
+        $transport = new FakeTransport([new HttpResponse(200, [], '{"id":1}')]);
+        $provider = new TestProvider(
+            'https://api.example.test',
+            new NullAuthorizationStrategy(),
+            $transport,
+            options: new ClientOptions(authorizationResolver: new PromptClassAuthorizationStrategyResolver([
+                GetUserPrompt::class => new ApiKeyAuthorizationStrategy('X-Api-Key', 'secret'),
+            ])),
+        );
+
+        $provider->call(new GetUserPrompt(['id' => 1]), UserResponse::class);
+
+        self::assertSame('secret', $transport->requests[0]->headers['X-Api-Key']);
+    }
+
+    /**
+     * Проверяет, что provider принимает составной BaseUrl без изменения Prompt DTO.
+     *
+     * @return void
+     */
+    public function testProviderAcceptsBaseUrlValueObject(): void
+    {
+        $transport = new FakeTransport([new HttpResponse(200, [], '{"id":1}')]);
+        $provider = new TestProvider(
+            new BaseUrl(host: 'api.example.test', prefix: 'v1'),
+            new NullAuthorizationStrategy(),
+            $transport,
+        );
+
+        $provider->call(new GetUserPrompt(['id' => 1]), UserResponse::class);
+
+        self::assertSame('https://api.example.test/v1/users/1', $transport->requests[0]->url);
+    }
+
+    /**
+     * Проверяет автоматическое обновление OAuth-токена и один повтор после 401.
+     *
+     * @return void
+     */
+    public function testRefreshableAuthorizationRetriesOnceAfterUnauthorizedResponse(): void
+    {
+        $transport = new FakeTransport([
+            new HttpResponse(200, [], '{"access_token":"first-token","expires_in":3600}'),
+            new HttpResponse(401, [], '{"error":{"message":"expired"}}'),
+            new HttpResponse(200, [], '{"access_token":"second-token","expires_in":3600}'),
+            new HttpResponse(200, [], '{"id":1,"name":"Refreshed"}'),
+        ]);
+        $provider = new TestProvider(
+            'https://api.example.test',
+            new ClientCredentialsAuthorizationStrategy('https://auth.example.test/token', 'client', 'secret'),
+            $transport,
+        );
+
+        /** @var UserResponse $response */
+        $response = $provider->call(new GetUserPrompt(['id' => 1]), UserResponse::class);
+
+        self::assertSame('Refreshed', $response->name);
+        self::assertCount(4, $transport->requests);
+        self::assertSame('https://auth.example.test/token', $transport->requests[0]->url);
+        self::assertSame('Bearer first-token', $transport->requests[1]->headers['Authorization']);
+        self::assertSame('https://auth.example.test/token', $transport->requests[2]->url);
+        self::assertSame('Bearer second-token', $transport->requests[3]->headers['Authorization']);
+        self::assertTrue($response->getRequest()?->metadata['authorizationRefreshed'] ?? false);
+    }
+
+    /**
+     * Проверяет, что список статусов refresh-retry можно отключить.
+     *
+     * @return void
+     */
+    public function testRefreshAuthorizationStatusCodesCanDisableUnauthorizedRetry(): void
+    {
+        $transport = new FakeTransport([
+            new HttpResponse(200, [], '{"access_token":"first-token","expires_in":3600}'),
+            new HttpResponse(401, [], '{"error":{"message":"expired"}}'),
+        ]);
+        $provider = new TestProvider(
+            'https://api.example.test',
+            new ClientCredentialsAuthorizationStrategy('https://auth.example.test/token', 'client', 'secret'),
+            $transport,
+            options: new ClientOptions(refreshAuthorizationStatusCodes: []),
+        );
+
+        $response = $provider->call(new GetUserPrompt(['id' => 1]), UserResponse::class);
+
+        self::assertTrue($response->hasError());
+        self::assertSame(401, $response->getStatusCode());
+        self::assertCount(2, $transport->requests);
     }
 
     /**
@@ -694,7 +795,27 @@ class ProviderPipelineTest extends TestCase
         $this->expectException(\LogicException::class);
 
         new class(['id' => 1]) extends AbstractResponse {
+            /** @phpstan-ignore-next-line Intentionally invalid class-string for runtime validation. */
             protected const MODEL = 'Andy87\\ClientsBase\\Tests\\MissingResponseModel';
         };
+    }
+
+    /**
+     * Проверяет diagnostic log у response DTO.
+     *
+     * @return void
+     */
+    public function testResponseDiagnosticsCanBeCollected(): void
+    {
+        $response = new UserResponse(['id' => 1, 'name' => 'Ivan']);
+
+        $response
+            ->addDiagnostic('raw payload kept for investigation')
+            ->addDiagnostic(['field' => 'name', 'status' => 'checked']);
+
+        self::assertSame([
+            'raw payload kept for investigation',
+            ['field' => 'name', 'status' => 'checked'],
+        ], $response->getDiagnostics());
     }
 }

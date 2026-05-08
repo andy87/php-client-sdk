@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Andy87\ClientsBase\Config;
 
 use Andy87\ClientsBase\Contracts\ApiErrorFactoryInterface;
+use Andy87\ClientsBase\Contracts\AuthorizationStrategyResolverInterface;
 use Andy87\ClientsBase\Contracts\BodyEncoderInterface;
 use Andy87\ClientsBase\Contracts\QueryEncoderInterface;
 use Andy87\ClientsBase\Contracts\RequestFactoryInterface;
@@ -40,6 +41,8 @@ class ClientOptions
      * @param RequestFactoryInterface|null $requestFactory Фабрика HTTP-запросов.
      * @param RequestFinalizerInterface|null $requestFinalizer Финализатор HTTP-запроса.
      * @param bool $validatePrompt Проверять обязательные поля Prompt DTO перед запросом.
+     * @param AuthorizationStrategyResolverInterface|null $authorizationResolver Resolver стратегии авторизации по Prompt DTO.
+     * @param list<int> $refreshAuthorizationStatusCodes HTTP-статусы для принудительного обновления авторизации и одного повтора запроса.
      *
      * @return void
      */
@@ -56,6 +59,8 @@ class ClientOptions
         public ?RequestFactoryInterface $requestFactory = null,
         public ?RequestFinalizerInterface $requestFinalizer = null,
         public bool $validatePrompt = true,
+        public ?AuthorizationStrategyResolverInterface $authorizationResolver = null,
+        public array $refreshAuthorizationStatusCodes = [401],
     ) {
         $this->headers = HeaderUtils::merge([], $this->headers);
         $this->retryPolicy ??= new NoRetryPolicy();

@@ -52,6 +52,9 @@ abstract class AbstractResponse implements ResponseInterface
     /** @var object|null OpenAPI schema-модель всего ответа. */
     public ?object $model = null;
 
+    /** @var list<string|array<string, mixed>> Диагностические записи response DTO. */
+    private array $diagnostics = [];
+
     /**
      * Создаёт DTO ответа.
      *
@@ -89,10 +92,8 @@ abstract class AbstractResponse implements ResponseInterface
         if ($error === null && static::MODEL !== null) {
             $modelClass = static::MODEL;
 
-            if (!is_string($modelClass) || !class_exists($modelClass)) {
-                $modelName = is_scalar($modelClass) ? (string) $modelClass : get_debug_type($modelClass);
-
-                throw new \LogicException(sprintf('Response MODEL "%s" must be an existing class.', $modelName));
+            if (!class_exists($modelClass)) {
+                throw new \LogicException(sprintf('Response MODEL "%s" must be an existing class.', $modelClass));
             }
 
             $this->model = new $modelClass($data);
@@ -190,6 +191,30 @@ abstract class AbstractResponse implements ResponseInterface
     }
 
     /**
+     * Добавляет диагностическую запись response DTO.
+     *
+     * @param string|array<string, mixed> $diagnostic Диагностическая запись.
+     *
+     * @return static Текущий response DTO.
+     */
+    public function addDiagnostic(string|array $diagnostic): static
+    {
+        $this->diagnostics[] = $diagnostic;
+
+        return $this;
+    }
+
+    /**
+     * Возвращает диагностические записи response DTO.
+     *
+     * @return list<string|array<string, mixed>> Диагностические записи.
+     */
+    public function getDiagnostics(): array
+    {
+        return $this->diagnostics;
+    }
+
+    /**
      * Проверяет обязательные поля ответа.
      *
      * @return void
@@ -246,9 +271,9 @@ abstract class AbstractResponse implements ResponseInterface
         $cast = static::CASTS[$property];
 
         if (is_array($cast)) {
-            $className = $cast[0] ?? null;
+            $className = $cast[0];
 
-            if (!is_string($className) || !is_array($value)) {
+            if (!is_array($value)) {
                 return $value;
             }
 
@@ -261,7 +286,5 @@ abstract class AbstractResponse implements ResponseInterface
         if (is_string($cast)) {
             return new $cast($value);
         }
-
-        return $value;
     }
 }

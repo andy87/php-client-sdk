@@ -245,9 +245,9 @@ abstract class AbstractPrompt implements PromptInterface
         $cast = static::CASTS[$property];
 
         if (is_array($cast)) {
-            $className = $cast[0] ?? null;
+            $className = $cast[0];
 
-            if (!is_string($className) || !is_array($value)) {
+            if (!is_array($value)) {
                 return $value;
             }
 
@@ -260,8 +260,6 @@ abstract class AbstractPrompt implements PromptInterface
         if (is_string($cast)) {
             return new $cast($value);
         }
-
-        return $value;
     }
 
     /**
