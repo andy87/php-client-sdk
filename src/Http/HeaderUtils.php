@@ -114,7 +114,11 @@ final class HeaderUtils
      */
     public static function normalizeValue(mixed $value): string
     {
-        if (is_int($value) || is_float($value) || is_bool($value) || $value instanceof \Stringable) {
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        if (is_int($value) || is_float($value) || $value instanceof \Stringable) {
             $value = (string) $value;
         }
 

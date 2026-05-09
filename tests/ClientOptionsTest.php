@@ -10,6 +10,7 @@ use Andy87\ClientsBase\Decoder\JsonResponseDecoder;
 use Andy87\ClientsBase\Encoder\DefaultBodyEncoder;
 use Andy87\ClientsBase\Encoder\DefaultQueryEncoder;
 use Andy87\ClientsBase\Error\DefaultApiErrorFactory;
+use Andy87\ClientsBase\Http\HeaderUtils;
 use Andy87\ClientsBase\Request\DefaultRequestFinalizer;
 use Andy87\ClientsBase\Request\DefaultRequestFactory;
 use Andy87\ClientsBase\Retry\NoRetryPolicy;
@@ -52,6 +53,25 @@ class ClientOptionsTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         new ClientOptions(headers: ['X-Test' => "ok\r\nX-Injected: 1"]);
+    }
+
+    /**
+     * Проверяет, что bool-значения заголовков сериализуются явно.
+     *
+     * @return void
+     */
+    public function testHeaderUtilsSerializesBooleanValuesExplicitly(): void
+    {
+        self::assertSame(
+            [
+                'X-Enabled' => 'true',
+                'X-Disabled' => 'false',
+            ],
+            HeaderUtils::merge([], [
+                'X-Enabled' => true,
+                'X-Disabled' => false,
+            ]),
+        );
     }
 
     /**
