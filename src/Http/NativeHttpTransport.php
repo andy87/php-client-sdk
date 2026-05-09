@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Http;
+namespace Andy87\PhpClientSdk\Http;
 
-use Andy87\ClientsBase\Contracts\HttpTransportInterface;
-use Andy87\ClientsBase\Contracts\QueryEncoderInterface;
-use Andy87\ClientsBase\Encoder\DefaultQueryEncoder;
-use Andy87\ClientsBase\Exception\TransportException;
+use Andy87\PhpClientSdk\Contracts\HttpTransportInterface;
+use Andy87\PhpClientSdk\Contracts\QueryEncoderInterface;
+use Andy87\PhpClientSdk\Encoder\DefaultQueryEncoder;
+use Andy87\PhpClientSdk\Exception\TransportException;
 
 /**
  * Выполняет HTTP-запросы средствами PHP stream wrapper.

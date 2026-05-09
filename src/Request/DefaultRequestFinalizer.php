@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Request;
+namespace Andy87\PhpClientSdk\Request;
 
-use Andy87\ClientsBase\Contracts\BodyEncoderInterface;
-use Andy87\ClientsBase\Contracts\QueryEncoderInterface;
-use Andy87\ClientsBase\Contracts\RequestFinalizerInterface;
-use Andy87\ClientsBase\Encoder\DefaultBodyEncoder;
-use Andy87\ClientsBase\Encoder\DefaultQueryEncoder;
-use Andy87\ClientsBase\Http\HeaderUtils;
-use Andy87\ClientsBase\Http\HttpRequest;
+use Andy87\PhpClientSdk\Contracts\BodyEncoderInterface;
+use Andy87\PhpClientSdk\Contracts\QueryEncoderInterface;
+use Andy87\PhpClientSdk\Contracts\RequestFinalizerInterface;
+use Andy87\PhpClientSdk\Encoder\DefaultBodyEncoder;
+use Andy87\PhpClientSdk\Encoder\DefaultQueryEncoder;
+use Andy87\PhpClientSdk\Http\HeaderUtils;
+use Andy87\PhpClientSdk\Http\HttpRequest;
 
 /**
  * Финализирует производные данные HTTP-запроса после пользовательских изменений.

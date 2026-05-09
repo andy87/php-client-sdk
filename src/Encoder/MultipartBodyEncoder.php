@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Encoder;
+namespace Andy87\PhpClientSdk\Encoder;
 
-use Andy87\ClientsBase\Contracts\BodyEncoderInterface;
-use Andy87\ClientsBase\Http\HeaderUtils;
-use Andy87\ClientsBase\Http\HttpBody;
-use Andy87\ClientsBase\Http\MultipartFile;
+use Andy87\PhpClientSdk\Contracts\BodyEncoderInterface;
+use Andy87\PhpClientSdk\Http\HeaderUtils;
+use Andy87\PhpClientSdk\Http\HttpBody;
+use Andy87\PhpClientSdk\Http\MultipartFile;
 
 /**
  * Кодирует тело HTTP-запроса в multipart/form-data.
@@ -34,7 +34,7 @@ class MultipartBodyEncoder implements BodyEncoderInterface
             throw new \InvalidArgumentException('Multipart body must be an array.');
         }
 
-        $boundary = $this->extractBoundary($contentType) ?? '----clients-sdk-' . bin2hex(random_bytes(12));
+        $boundary = $this->extractBoundary($contentType) ?? '----php-client-sdk-' . bin2hex(random_bytes(12));
         $content = '';
 
         foreach ($body as $name => $value) {

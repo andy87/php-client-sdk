@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Runtime;
+namespace Andy87\PhpClientSdk\Runtime;
 
-use Andy87\ClientsBase\Http\HeaderUtils;
+use Andy87\PhpClientSdk\Http\HeaderUtils;
 
 /**
  * Хранит runtime-настройки API-клиента: обработчики событий и дефолтные заголовки.

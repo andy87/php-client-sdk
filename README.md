@@ -1,4 +1,4 @@
-# Clients Base
+# PHP Client SDK
 
 Base abstractions for building typed PHP API clients.
 
@@ -6,7 +6,7 @@ Base abstractions for building typed PHP API clients.
 
 ## Overview
 
-`andy87/clients-sdk` provides a small set of reusable building blocks for API client SDKs:
+`andy87/php-client-sdk` provides a small set of reusable building blocks for API client SDKs:
 
 - prompt DTOs for request method, endpoint, path parameters, query parameters, body and validation;
 - response DTOs for normalized response data, status code, headers and API errors;
@@ -24,7 +24,7 @@ The package does not generate API clients and does not depend on a specific HTTP
 ## Installation
 
 ```bash
-composer require andy87/clients-sdk
+composer require andy87/php-client-sdk
 ```
 
 ## Core Concepts
@@ -48,7 +48,7 @@ Use `PublicPrompt` for public endpoints and `PrivatePrompt` for private endpoint
 
 declare(strict_types=1);
 
-use Andy87\ClientsBase\Prompt\AbstractPrompt;
+use Andy87\PhpClientSdk\Prompt\AbstractPrompt;
 
 /**
  * Describes a request for loading one user by identifier.
@@ -77,8 +77,8 @@ final class GetUserPrompt extends AbstractPrompt
 
 declare(strict_types=1);
 
-use Andy87\ClientsBase\Prompt\PrivatePrompt;
-use Andy87\ClientsBase\Prompt\PublicPrompt;
+use Andy87\PhpClientSdk\Prompt\PrivatePrompt;
+use Andy87\PhpClientSdk\Prompt\PublicPrompt;
 
 /**
  * Describes a public health-check request.
@@ -109,7 +109,7 @@ Extend `AbstractResponse` to describe data returned by the API. On successful re
 
 declare(strict_types=1);
 
-use Andy87\ClientsBase\Response\AbstractResponse;
+use Andy87\PhpClientSdk\Response\AbstractResponse;
 
 /**
  * Contains user data returned by the API.
@@ -136,7 +136,7 @@ Extend `AbstractProvider` and expose public methods for concrete API operations.
 
 declare(strict_types=1);
 
-use Andy87\ClientsBase\Provider\AbstractProvider;
+use Andy87\PhpClientSdk\Provider\AbstractProvider;
 
 /**
  * Provides typed access to user API methods.
@@ -171,10 +171,10 @@ Create the provider with a base URL, authorization strategy and transport:
 
 declare(strict_types=1);
 
-use Andy87\ClientsBase\Auth\NullAuthorizationStrategy;
-use Andy87\ClientsBase\Config\ClientOptions;
-use Andy87\ClientsBase\Http\NativeHttpTransport;
-use Andy87\ClientsBase\Retry\DefaultRetryPolicy;
+use Andy87\PhpClientSdk\Auth\NullAuthorizationStrategy;
+use Andy87\PhpClientSdk\Config\ClientOptions;
+use Andy87\PhpClientSdk\Http\NativeHttpTransport;
+use Andy87\PhpClientSdk\Retry\DefaultRetryPolicy;
 
 $provider = new UsersProvider(
     baseUrl: 'https://api.example.com',
@@ -223,7 +223,7 @@ Retry is disabled by default. Use `DefaultRetryPolicy` only when repeated reques
 
 declare(strict_types=1);
 
-use Andy87\ClientsBase\Config\ClientOptions;
+use Andy87\PhpClientSdk\Config\ClientOptions;
 
 $options = new ClientOptions(
     strictValidation: true,
@@ -240,7 +240,7 @@ Use `BaseUrl` when a client wants to configure protocol, host, port and path pre
 
 declare(strict_types=1);
 
-use Andy87\ClientsBase\Config\BaseUrl;
+use Andy87\PhpClientSdk\Config\BaseUrl;
 
 $baseUrl = new BaseUrl(
     host: 'api.example.com',
@@ -258,9 +258,9 @@ $baseUrl = new BaseUrl(
 
 declare(strict_types=1);
 
-use Andy87\ClientsBase\Event\BeforeRequestEvent;
-use Andy87\ClientsBase\Event\ClientEvents;
-use Andy87\ClientsBase\Runtime\ClientRuntime;
+use Andy87\PhpClientSdk\Event\BeforeRequestEvent;
+use Andy87\PhpClientSdk\Event\ClientEvents;
+use Andy87\PhpClientSdk\Runtime\ClientRuntime;
 
 $runtime = new ClientRuntime(
     headers: [
@@ -296,7 +296,7 @@ Use `NullAuthorizationStrategy` for public APIs:
 
 declare(strict_types=1);
 
-use Andy87\ClientsBase\Auth\NullAuthorizationStrategy;
+use Andy87\PhpClientSdk\Auth\NullAuthorizationStrategy;
 
 $authorization = new NullAuthorizationStrategy();
 ```
@@ -308,7 +308,7 @@ Use `ClientCredentialsAuthorizationStrategy` for OAuth `client_credentials`. The
 
 declare(strict_types=1);
 
-use Andy87\ClientsBase\Auth\ClientCredentialsAuthorizationStrategy;
+use Andy87\PhpClientSdk\Auth\ClientCredentialsAuthorizationStrategy;
 
 $authorization = new ClientCredentialsAuthorizationStrategy(
     tokenUrl: 'https://auth.example.com/oauth/token',
@@ -341,10 +341,10 @@ Use an authorization resolver when different operations require different author
 
 declare(strict_types=1);
 
-use Andy87\ClientsBase\Auth\ApiKeyAuthorizationStrategy;
-use Andy87\ClientsBase\Auth\AuthorizationProfileStrategyResolver;
-use Andy87\ClientsBase\Auth\PromptClassAuthorizationStrategyResolver;
-use Andy87\ClientsBase\Config\ClientOptions;
+use Andy87\PhpClientSdk\Auth\ApiKeyAuthorizationStrategy;
+use Andy87\PhpClientSdk\Auth\AuthorizationProfileStrategyResolver;
+use Andy87\PhpClientSdk\Auth\PromptClassAuthorizationStrategyResolver;
+use Andy87\PhpClientSdk\Config\ClientOptions;
 
 $options = new ClientOptions(
     authorizationResolver: new PromptClassAuthorizationStrategyResolver([
@@ -382,9 +382,9 @@ Custom transports must implement `HttpTransportInterface`:
 
 declare(strict_types=1);
 
-use Andy87\ClientsBase\Contracts\HttpTransportInterface;
-use Andy87\ClientsBase\Http\HttpRequest;
-use Andy87\ClientsBase\Http\HttpResponse;
+use Andy87\PhpClientSdk\Contracts\HttpTransportInterface;
+use Andy87\PhpClientSdk\Http\HttpRequest;
+use Andy87\PhpClientSdk\Http\HttpResponse;
 
 /**
  * Sends HTTP requests through an application-specific client.
@@ -416,11 +416,11 @@ final class CustomTransport implements HttpTransportInterface
 
 declare(strict_types=1);
 
-use Andy87\ClientsBase\Auth\NullAuthorizationStrategy;
-use Andy87\ClientsBase\Config\ClientOptions;
-use Andy87\ClientsBase\Mock\MockTransport;
-use Andy87\ClientsBase\Mock\PromptClassMockResponseResolver;
-use Andy87\ClientsBase\Mock\RouteMockResponseResolver;
+use Andy87\PhpClientSdk\Auth\NullAuthorizationStrategy;
+use Andy87\PhpClientSdk\Config\ClientOptions;
+use Andy87\PhpClientSdk\Mock\MockTransport;
+use Andy87\PhpClientSdk\Mock\PromptClassMockResponseResolver;
+use Andy87\PhpClientSdk\Mock\RouteMockResponseResolver;
 
 $resolver = (new RouteMockResponseResolver())
     ->addJson('GET', '/users/{id}', [
@@ -454,8 +454,8 @@ If route paths are unstable or generated, use `PromptClassMockResponseResolver` 
 
 declare(strict_types=1);
 
-use Andy87\ClientsBase\Mock\MockTransport;
-use Andy87\ClientsBase\Mock\PromptClassMockResponseResolver;
+use Andy87\PhpClientSdk\Mock\MockTransport;
+use Andy87\PhpClientSdk\Mock\PromptClassMockResponseResolver;
 
 $resolver = (new PromptClassMockResponseResolver())
     ->addJson(GetUserPrompt::class, [
@@ -479,9 +479,9 @@ $provider = new UsersProvider(
 
 declare(strict_types=1);
 
-use Andy87\ClientsBase\Http\NativeHttpTransport;
-use Andy87\ClientsBase\Http\TraceableTransport;
-use Andy87\ClientsBase\Auth\NullAuthorizationStrategy;
+use Andy87\PhpClientSdk\Http\NativeHttpTransport;
+use Andy87\PhpClientSdk\Http\TraceableTransport;
+use Andy87\PhpClientSdk\Auth\NullAuthorizationStrategy;
 
 $transport = new TraceableTransport(new NativeHttpTransport());
 $provider = new UsersProvider(

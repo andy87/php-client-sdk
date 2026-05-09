@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Encoder;
+namespace Andy87\PhpClientSdk\Encoder;
 
-use Andy87\ClientsBase\Contracts\QueryEncoderInterface;
+use Andy87\PhpClientSdk\Contracts\QueryEncoderInterface;
 
 /**
  * Кодирует query-параметры стандартным PHP-форматом RFC 3986.

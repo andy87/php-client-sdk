@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Tests\Support;
+namespace Andy87\PhpClientSdk\Tests\Support;
 
-use Andy87\ClientsBase\Contracts\HttpTransportInterface;
-use Andy87\ClientsBase\Http\HttpRequest;
-use Andy87\ClientsBase\Http\HttpResponse;
+use Andy87\PhpClientSdk\Contracts\HttpTransportInterface;
+use Andy87\PhpClientSdk\Http\HttpRequest;
+use Andy87\PhpClientSdk\Http\HttpResponse;
 
 /**
  * Тестовый HTTP-транспорт с очередью заранее заданных ответов.

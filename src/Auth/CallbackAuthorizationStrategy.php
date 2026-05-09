@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Auth;
+namespace Andy87\PhpClientSdk\Auth;
 
-use Andy87\ClientsBase\Contracts\AuthorizationStrategyInterface;
-use Andy87\ClientsBase\Contracts\HttpTransportInterface;
+use Andy87\PhpClientSdk\Contracts\AuthorizationStrategyInterface;
+use Andy87\PhpClientSdk\Contracts\HttpTransportInterface;
 
 /**
  * Получает заголовки авторизации из пользовательского callback.

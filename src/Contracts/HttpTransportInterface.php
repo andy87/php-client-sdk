@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Contracts;
+namespace Andy87\PhpClientSdk\Contracts;
 
-use Andy87\ClientsBase\Http\HttpRequest;
-use Andy87\ClientsBase\Http\HttpResponse;
+use Andy87\PhpClientSdk\Http\HttpRequest;
+use Andy87\PhpClientSdk\Http\HttpResponse;
 
 /**
  * Описывает транспортный слой HTTP-запросов.

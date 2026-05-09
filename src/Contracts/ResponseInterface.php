@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Contracts;
+namespace Andy87\PhpClientSdk\Contracts;
 
-use Andy87\ClientsBase\Dto\ApiError;
-use Andy87\ClientsBase\Http\HttpRequest;
+use Andy87\PhpClientSdk\Dto\ApiError;
+use Andy87\PhpClientSdk\Http\HttpRequest;
 
 /**
  * Описывает DTO ответа API.

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Contracts;
+namespace Andy87\PhpClientSdk\Contracts;
 
-use Andy87\ClientsBase\Http\HttpRequest;
+use Andy87\PhpClientSdk\Http\HttpRequest;
 
 /**
  * Создаёт HTTP-запрос из Prompt DTO и настроек клиента.

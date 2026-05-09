@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Tests\Support;
+namespace Andy87\PhpClientSdk\Tests\Support;
 
-use Andy87\ClientsBase\Contracts\PromptInterface;
-use Andy87\ClientsBase\Contracts\ResponseInterface;
-use Andy87\ClientsBase\Provider\AbstractProvider;
+use Andy87\PhpClientSdk\Contracts\PromptInterface;
+use Andy87\PhpClientSdk\Contracts\ResponseInterface;
+use Andy87\PhpClientSdk\Provider\AbstractProvider;
 
 /**
  * Тестовый provider, открывающий protected request() для PHPUnit.

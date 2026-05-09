@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Error;
+namespace Andy87\PhpClientSdk\Error;
 
-use Andy87\ClientsBase\Contracts\ApiErrorFactoryInterface;
-use Andy87\ClientsBase\Dto\ApiError;
-use Andy87\ClientsBase\Http\HttpResponse;
+use Andy87\PhpClientSdk\Contracts\ApiErrorFactoryInterface;
+use Andy87\PhpClientSdk\Dto\ApiError;
+use Andy87\PhpClientSdk\Http\HttpResponse;
 
 /**
  * Создаёт ApiError из распространённых форматов ошибок API.

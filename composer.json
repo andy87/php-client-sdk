@@ -1,16 +1,16 @@
 {
-  "name": "andy87/clients-sdk",
+  "name": "andy87/php-client-sdk",
   "description": "Base abstractions for typed PHP API clients.",
   "type": "library",
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "Andy87\\ClientsBase\\": "src/"
+      "Andy87\\PhpClientSdk\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Andy87\\ClientsBase\\Tests\\": "tests/"
+      "Andy87\\PhpClientSdk\\Tests\\": "tests/"
     }
   },
   "require": {

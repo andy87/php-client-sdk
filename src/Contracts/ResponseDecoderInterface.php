@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Contracts;
+namespace Andy87\PhpClientSdk\Contracts;
 
-use Andy87\ClientsBase\Http\HttpResponse;
+use Andy87\PhpClientSdk\Http\HttpResponse;
 
 /**
  * Декодирует raw HTTP-ответ в данные для Response DTO.

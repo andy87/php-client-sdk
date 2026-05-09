@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Auth;
+namespace Andy87\PhpClientSdk\Auth;
 
-use Andy87\ClientsBase\Contracts\HttpTransportInterface;
-use Andy87\ClientsBase\Contracts\RefreshableAuthorizationStrategyInterface;
-use Andy87\ClientsBase\Exception\AuthorizationException;
-use Andy87\ClientsBase\Http\HttpRequest;
+use Andy87\PhpClientSdk\Contracts\HttpTransportInterface;
+use Andy87\PhpClientSdk\Contracts\RefreshableAuthorizationStrategyInterface;
+use Andy87\PhpClientSdk\Exception\AuthorizationException;
+use Andy87\PhpClientSdk\Http\HttpRequest;
 
 /**
  * Выполняет OAuth client_credentials авторизацию и кэширует access token в памяти процесса.

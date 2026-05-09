@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Contracts;
+namespace Andy87\PhpClientSdk\Contracts;
 
 /**
  * Описывает подключаемый сценарий авторизации API-клиента.

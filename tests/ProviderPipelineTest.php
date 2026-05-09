@@ -2,40 +2,40 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Tests;
+namespace Andy87\PhpClientSdk\Tests;
 
-use Andy87\ClientsBase\Auth\ApiKeyAuthorizationStrategy;
-use Andy87\ClientsBase\Auth\ClientCredentialsAuthorizationStrategy;
-use Andy87\ClientsBase\Auth\NullAuthorizationStrategy;
-use Andy87\ClientsBase\Auth\PromptClassAuthorizationStrategyResolver;
-use Andy87\ClientsBase\Config\BaseUrl;
-use Andy87\ClientsBase\Config\ClientOptions;
-use Andy87\ClientsBase\Dto\ApiError;
-use Andy87\ClientsBase\Exception\AuthorizationException;
-use Andy87\ClientsBase\Exception\ResponseDecodeException;
-use Andy87\ClientsBase\Exception\ResponseHydrationException;
-use Andy87\ClientsBase\Exception\TransportException;
-use Andy87\ClientsBase\Exception\ValidationException;
-use Andy87\ClientsBase\Encoder\DefaultBodyEncoder;
-use Andy87\ClientsBase\Encoder\MultipartBodyEncoder;
-use Andy87\ClientsBase\Event\ClientEvents;
-use Andy87\ClientsBase\Http\MultipartFile;
-use Andy87\ClientsBase\Http\HttpResponse;
-use Andy87\ClientsBase\Http\HttpRequest;
-use Andy87\ClientsBase\Http\NativeHttpTransport;
-use Andy87\ClientsBase\Mock\CallbackMockResponseResolver;
-use Andy87\ClientsBase\Mock\CompositeMockResponseResolver;
-use Andy87\ClientsBase\Mock\MockTransport;
-use Andy87\ClientsBase\Mock\RouteMockResponseResolver;
-use Andy87\ClientsBase\Prompt\AbstractPrompt;
-use Andy87\ClientsBase\Request\DefaultRequestFactory;
-use Andy87\ClientsBase\Response\AbstractResponse;
-use Andy87\ClientsBase\Retry\DefaultRetryPolicy;
-use Andy87\ClientsBase\Tests\Support\CreateUserPrompt;
-use Andy87\ClientsBase\Tests\Support\FakeTransport;
-use Andy87\ClientsBase\Tests\Support\GetUserPrompt;
-use Andy87\ClientsBase\Tests\Support\TestProvider;
-use Andy87\ClientsBase\Tests\Support\UserResponse;
+use Andy87\PhpClientSdk\Auth\ApiKeyAuthorizationStrategy;
+use Andy87\PhpClientSdk\Auth\ClientCredentialsAuthorizationStrategy;
+use Andy87\PhpClientSdk\Auth\NullAuthorizationStrategy;
+use Andy87\PhpClientSdk\Auth\PromptClassAuthorizationStrategyResolver;
+use Andy87\PhpClientSdk\Config\BaseUrl;
+use Andy87\PhpClientSdk\Config\ClientOptions;
+use Andy87\PhpClientSdk\Dto\ApiError;
+use Andy87\PhpClientSdk\Exception\AuthorizationException;
+use Andy87\PhpClientSdk\Exception\ResponseDecodeException;
+use Andy87\PhpClientSdk\Exception\ResponseHydrationException;
+use Andy87\PhpClientSdk\Exception\TransportException;
+use Andy87\PhpClientSdk\Exception\ValidationException;
+use Andy87\PhpClientSdk\Encoder\DefaultBodyEncoder;
+use Andy87\PhpClientSdk\Encoder\MultipartBodyEncoder;
+use Andy87\PhpClientSdk\Event\ClientEvents;
+use Andy87\PhpClientSdk\Http\MultipartFile;
+use Andy87\PhpClientSdk\Http\HttpResponse;
+use Andy87\PhpClientSdk\Http\HttpRequest;
+use Andy87\PhpClientSdk\Http\NativeHttpTransport;
+use Andy87\PhpClientSdk\Mock\CallbackMockResponseResolver;
+use Andy87\PhpClientSdk\Mock\CompositeMockResponseResolver;
+use Andy87\PhpClientSdk\Mock\MockTransport;
+use Andy87\PhpClientSdk\Mock\RouteMockResponseResolver;
+use Andy87\PhpClientSdk\Prompt\AbstractPrompt;
+use Andy87\PhpClientSdk\Request\DefaultRequestFactory;
+use Andy87\PhpClientSdk\Response\AbstractResponse;
+use Andy87\PhpClientSdk\Retry\DefaultRetryPolicy;
+use Andy87\PhpClientSdk\Tests\Support\CreateUserPrompt;
+use Andy87\PhpClientSdk\Tests\Support\FakeTransport;
+use Andy87\PhpClientSdk\Tests\Support\GetUserPrompt;
+use Andy87\PhpClientSdk\Tests\Support\TestProvider;
+use Andy87\PhpClientSdk\Tests\Support\UserResponse;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -717,7 +717,7 @@ class ProviderPipelineTest extends TestCase
      */
     public function testMultipartBodyRejectsHeaderInjectionInFilename(): void
     {
-        $path = tempnam(sys_get_temp_dir(), 'clients-sdk');
+        $path = tempnam(sys_get_temp_dir(), 'php-client-sdk');
         self::assertIsString($path);
         file_put_contents($path, 'abc');
 
@@ -909,7 +909,7 @@ class ProviderPipelineTest extends TestCase
 
         new class(['id' => 1]) extends AbstractResponse {
             /** @phpstan-ignore-next-line Intentionally invalid class-string for runtime validation. */
-            protected const MODEL = 'Andy87\\ClientsBase\\Tests\\MissingResponseModel';
+            protected const MODEL = 'Andy87\\PhpClientSdk\\Tests\\MissingResponseModel';
         };
     }
 

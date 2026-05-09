@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Event;
+namespace Andy87\PhpClientSdk\Event;
 
 /**
  * Хранит имена событий, поддерживаемых базовым SDK.

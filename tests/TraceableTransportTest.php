@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Tests;
+namespace Andy87\PhpClientSdk\Tests;
 
-use Andy87\ClientsBase\Http\HttpRequest;
-use Andy87\ClientsBase\Http\HttpResponse;
-use Andy87\ClientsBase\Http\TraceableTransport;
-use Andy87\ClientsBase\Tests\Support\FakeTransport;
+use Andy87\PhpClientSdk\Http\HttpRequest;
+use Andy87\PhpClientSdk\Http\HttpResponse;
+use Andy87\PhpClientSdk\Http\TraceableTransport;
+use Andy87\PhpClientSdk\Tests\Support\FakeTransport;
 use PHPUnit\Framework\TestCase;
 
 /**

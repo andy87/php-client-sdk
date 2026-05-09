@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Response;
+namespace Andy87\PhpClientSdk\Response;
 
-use Andy87\ClientsBase\Contracts\ResponseInterface;
-use Andy87\ClientsBase\Dto\ApiError;
-use Andy87\ClientsBase\Http\HttpRequest;
+use Andy87\PhpClientSdk\Contracts\ResponseInterface;
+use Andy87\PhpClientSdk\Dto\ApiError;
+use Andy87\PhpClientSdk\Http\HttpRequest;
 
 /**
  * Базовый DTO ответа с гидрацией, ошибкой и проверкой обязательных полей.

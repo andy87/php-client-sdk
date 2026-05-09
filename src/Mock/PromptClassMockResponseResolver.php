@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Mock;
+namespace Andy87\PhpClientSdk\Mock;
 
-use Andy87\ClientsBase\Contracts\PromptInterface;
-use Andy87\ClientsBase\Http\HeaderUtils;
-use Andy87\ClientsBase\Http\HttpRequest;
-use Andy87\ClientsBase\Http\HttpResponse;
+use Andy87\PhpClientSdk\Contracts\PromptInterface;
+use Andy87\PhpClientSdk\Http\HeaderUtils;
+use Andy87\PhpClientSdk\Http\HttpRequest;
+use Andy87\PhpClientSdk\Http\HttpResponse;
 
 /**
  * Resolver mock-ответов по классу Prompt DTO из metadata HTTP-запроса.

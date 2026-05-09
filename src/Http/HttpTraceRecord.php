@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Http;
+namespace Andy87\PhpClientSdk\Http;
 
 /**
  * Хранит диагностическую запись одного HTTP-вызова.

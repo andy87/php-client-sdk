@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Tests;
+namespace Andy87\PhpClientSdk\Tests;
 
-use Andy87\ClientsBase\Auth\ApiKeyAuthorizationStrategy;
-use Andy87\ClientsBase\Auth\AuthorizationProfileStrategyResolver;
-use Andy87\ClientsBase\Auth\BearerTokenAuthorizationStrategy;
-use Andy87\ClientsBase\Auth\NullAuthorizationStrategy;
-use Andy87\ClientsBase\Config\ClientOptions;
-use Andy87\ClientsBase\Http\HttpResponse;
-use Andy87\ClientsBase\Prompt\AbstractPrompt;
-use Andy87\ClientsBase\Prompt\PrivatePrompt;
-use Andy87\ClientsBase\Prompt\PublicPrompt;
-use Andy87\ClientsBase\Tests\Support\FakeTransport;
-use Andy87\ClientsBase\Tests\Support\TestProvider;
-use Andy87\ClientsBase\Tests\Support\UserResponse;
+use Andy87\PhpClientSdk\Auth\ApiKeyAuthorizationStrategy;
+use Andy87\PhpClientSdk\Auth\AuthorizationProfileStrategyResolver;
+use Andy87\PhpClientSdk\Auth\BearerTokenAuthorizationStrategy;
+use Andy87\PhpClientSdk\Auth\NullAuthorizationStrategy;
+use Andy87\PhpClientSdk\Config\ClientOptions;
+use Andy87\PhpClientSdk\Http\HttpResponse;
+use Andy87\PhpClientSdk\Prompt\AbstractPrompt;
+use Andy87\PhpClientSdk\Prompt\PrivatePrompt;
+use Andy87\PhpClientSdk\Prompt\PublicPrompt;
+use Andy87\PhpClientSdk\Tests\Support\FakeTransport;
+use Andy87\PhpClientSdk\Tests\Support\TestProvider;
+use Andy87\PhpClientSdk\Tests\Support\UserResponse;
 use PHPUnit\Framework\TestCase;
 
 /**

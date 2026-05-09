@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Encoder;
+namespace Andy87\PhpClientSdk\Encoder;
 
-use Andy87\ClientsBase\Contracts\BodyEncoderInterface;
-use Andy87\ClientsBase\Http\HttpBody;
+use Andy87\PhpClientSdk\Contracts\BodyEncoderInterface;
+use Andy87\PhpClientSdk\Http\HttpBody;
 
 /**
  * Кодирует тело HTTP-запроса в application/x-www-form-urlencoded.

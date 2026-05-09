@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Http;
+namespace Andy87\PhpClientSdk\Http;
 
-use Andy87\ClientsBase\Decoder\JsonResponseDecoder;
+use Andy87\PhpClientSdk\Decoder\JsonResponseDecoder;
 
 /**
  * Хранит данные HTTP-ответа.

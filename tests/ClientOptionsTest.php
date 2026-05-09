@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Tests;
+namespace Andy87\PhpClientSdk\Tests;
 
-use Andy87\ClientsBase\Config\ClientOptions;
-use Andy87\ClientsBase\Config\BaseUrl;
-use Andy87\ClientsBase\Decoder\JsonResponseDecoder;
-use Andy87\ClientsBase\Encoder\DefaultBodyEncoder;
-use Andy87\ClientsBase\Encoder\DefaultQueryEncoder;
-use Andy87\ClientsBase\Error\DefaultApiErrorFactory;
-use Andy87\ClientsBase\Http\HeaderUtils;
-use Andy87\ClientsBase\Request\DefaultRequestFinalizer;
-use Andy87\ClientsBase\Request\DefaultRequestFactory;
-use Andy87\ClientsBase\Retry\NoRetryPolicy;
+use Andy87\PhpClientSdk\Config\ClientOptions;
+use Andy87\PhpClientSdk\Config\BaseUrl;
+use Andy87\PhpClientSdk\Decoder\JsonResponseDecoder;
+use Andy87\PhpClientSdk\Encoder\DefaultBodyEncoder;
+use Andy87\PhpClientSdk\Encoder\DefaultQueryEncoder;
+use Andy87\PhpClientSdk\Error\DefaultApiErrorFactory;
+use Andy87\PhpClientSdk\Http\HeaderUtils;
+use Andy87\PhpClientSdk\Request\DefaultRequestFinalizer;
+use Andy87\PhpClientSdk\Request\DefaultRequestFactory;
+use Andy87\PhpClientSdk\Retry\NoRetryPolicy;
 use PHPUnit\Framework\TestCase;
 
 /**

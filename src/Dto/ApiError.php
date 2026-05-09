@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Dto;
+namespace Andy87\PhpClientSdk\Dto;
 
 /**
  * Хранит нормализованные данные ошибки API.

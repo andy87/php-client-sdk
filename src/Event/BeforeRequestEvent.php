@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Event;
+namespace Andy87\PhpClientSdk\Event;
 
-use Andy87\ClientsBase\Contracts\PromptInterface;
-use Andy87\ClientsBase\Http\HttpRequest;
-use Andy87\ClientsBase\Provider\AbstractProvider;
+use Andy87\PhpClientSdk\Contracts\PromptInterface;
+use Andy87\PhpClientSdk\Http\HttpRequest;
+use Andy87\PhpClientSdk\Provider\AbstractProvider;
 
 /**
  * Описывает событие перед отправкой HTTP-запроса.

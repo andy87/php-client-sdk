@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Http;
+namespace Andy87\PhpClientSdk\Http;
 
-use Andy87\ClientsBase\Contracts\HttpTransportInterface;
+use Andy87\PhpClientSdk\Contracts\HttpTransportInterface;
 
 /**
  * Диагностический transport-wrapper, записывающий HTTP-запросы, ответы, исключения и длительность.

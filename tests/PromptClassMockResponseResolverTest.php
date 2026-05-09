@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Tests;
+namespace Andy87\PhpClientSdk\Tests;
 
-use Andy87\ClientsBase\Http\HttpRequest;
-use Andy87\ClientsBase\Http\HttpResponse;
-use Andy87\ClientsBase\Mock\PromptClassMockResponseResolver;
-use Andy87\ClientsBase\Tests\Support\CreateUserPrompt;
-use Andy87\ClientsBase\Tests\Support\GetUserPrompt;
+use Andy87\PhpClientSdk\Http\HttpRequest;
+use Andy87\PhpClientSdk\Http\HttpResponse;
+use Andy87\PhpClientSdk\Mock\PromptClassMockResponseResolver;
+use Andy87\PhpClientSdk\Tests\Support\CreateUserPrompt;
+use Andy87\PhpClientSdk\Tests\Support\GetUserPrompt;
 use PHPUnit\Framework\TestCase;
 
 /**

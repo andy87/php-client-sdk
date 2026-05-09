@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Auth;
+namespace Andy87\PhpClientSdk\Auth;
 
-use Andy87\ClientsBase\Contracts\AuthorizationStrategyInterface;
-use Andy87\ClientsBase\Contracts\AuthorizationStrategyResolverInterface;
-use Andy87\ClientsBase\Contracts\PromptInterface;
+use Andy87\PhpClientSdk\Contracts\AuthorizationStrategyInterface;
+use Andy87\PhpClientSdk\Contracts\AuthorizationStrategyResolverInterface;
+use Andy87\PhpClientSdk\Contracts\PromptInterface;
 
 /**
  * Выбирает стратегию авторизации через пользовательский callback.

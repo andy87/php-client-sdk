@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Config;
+namespace Andy87\PhpClientSdk\Config;
 
 /**
  * Хранит составные части базового URL API.

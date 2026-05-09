@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Andy87\ClientsBase\Retry;
+namespace Andy87\PhpClientSdk\Retry;
 
-use Andy87\ClientsBase\Contracts\RetryPolicyInterface;
-use Andy87\ClientsBase\Http\HttpRequest;
-use Andy87\ClientsBase\Http\HttpResponse;
+use Andy87\PhpClientSdk\Contracts\RetryPolicyInterface;
+use Andy87\PhpClientSdk\Http\HttpRequest;
+use Andy87\PhpClientSdk\Http\HttpResponse;
 
 /**
  * Повторяет безопасные HTTP-запросы по настраиваемым статусам и сетевым ошибкам.
