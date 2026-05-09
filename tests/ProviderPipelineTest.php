@@ -8,6 +8,7 @@ use Andy87\PhpClientSdk\Auth\ApiKeyAuthorizationStrategy;
 use Andy87\PhpClientSdk\Auth\ClientCredentialsAuthorizationStrategy;
 use Andy87\PhpClientSdk\Auth\NullAuthorizationStrategy;
 use Andy87\PhpClientSdk\Auth\PromptClassAuthorizationStrategyResolver;
+use Andy87\PhpClientSdk\Cache\ArrayCache;
 use Andy87\PhpClientSdk\Config\BaseUrl;
 use Andy87\PhpClientSdk\Config\ClientOptions;
 use Andy87\PhpClientSdk\Dto\ApiError;
@@ -590,6 +591,121 @@ class ProviderPipelineTest extends TestCase
         $headers = $authorization->getAuthorizationHeaders(new MockTransport($resolver));
 
         self::assertSame(['Authorization' => 'Bearer mock-token'], $headers);
+    }
+
+    /**
+     * Проверяет, что OAuth client_credentials переиспользует access token из внешнего кеша.
+     *
+     * @return void
+     */
+    public function testClientCredentialsAuthorizationReusesExternalTokenCache(): void
+    {
+        $cache = new ArrayCache();
+        $firstTransport = new FakeTransport([new HttpResponse(200, [], '{"access_token":"cached-token","expires_in":3600}')]);
+        $firstAuthorization = new ClientCredentialsAuthorizationStrategy(
+            'https://auth.example.test/token',
+            'client',
+            'secret',
+            tokenCache: $cache,
+            tokenCacheKey: 'oauth:test',
+        );
+
+        self::assertSame(['Authorization' => 'Bearer cached-token'], $firstAuthorization->getAuthorizationHeaders($firstTransport));
+        self::assertCount(1, $firstTransport->requests);
+
+        $secondTransport = new FakeTransport([]);
+        $secondAuthorization = new ClientCredentialsAuthorizationStrategy(
+            'https://auth.example.test/token',
+            'client',
+            'secret',
+            tokenCache: $cache,
+            tokenCacheKey: 'oauth:test',
+        );
+
+        self::assertSame(['Authorization' => 'Bearer cached-token'], $secondAuthorization->getAuthorizationHeaders($secondTransport));
+        self::assertCount(0, $secondTransport->requests);
+    }
+
+    /**
+     * Проверяет, что OAuth client_credentials обновляет внешний токен заранее по clock skew.
+     *
+     * @return void
+     */
+    public function testClientCredentialsAuthorizationRefreshesExternalTokenBeforeExpiration(): void
+    {
+        $cache = new ArrayCache();
+        $cache->set('oauth:test', [
+            'access_token' => 'almost-expired-token',
+            'expires_at' => time() + 30,
+        ], 30);
+        $transport = new FakeTransport([new HttpResponse(200, [], '{"access_token":"fresh-token","expires_in":3600}')]);
+        $authorization = new ClientCredentialsAuthorizationStrategy(
+            'https://auth.example.test/token',
+            'client',
+            'secret',
+            tokenCache: $cache,
+            tokenCacheKey: 'oauth:test',
+            clockSkew: 60,
+        );
+
+        self::assertSame(['Authorization' => 'Bearer fresh-token'], $authorization->getAuthorizationHeaders($transport));
+        self::assertCount(1, $transport->requests);
+
+        $cachedToken = $cache->get('oauth:test');
+        self::assertIsArray($cachedToken);
+        self::assertSame('fresh-token', $cachedToken['access_token'] ?? null);
+        self::assertGreaterThan(time() + 3500, $cachedToken['expires_at'] ?? 0);
+    }
+
+    /**
+     * Проверяет, что свежезапрошенный короткоживущий токен возвращается даже при большом clock skew.
+     *
+     * @return void
+     */
+    public function testClientCredentialsAuthorizationReturnsFreshShortLivedToken(): void
+    {
+        $cache = new ArrayCache();
+        $transport = new FakeTransport([new HttpResponse(200, [], '{"access_token":"short-token","expires_in":30}')]);
+        $authorization = new ClientCredentialsAuthorizationStrategy(
+            'https://auth.example.test/token',
+            'client',
+            'secret',
+            tokenCache: $cache,
+            tokenCacheKey: 'oauth:test',
+            clockSkew: 60,
+        );
+
+        self::assertSame(['Authorization' => 'Bearer short-token'], $authorization->getAuthorizationHeaders($transport));
+        self::assertCount(1, $transport->requests);
+    }
+
+    /**
+     * Проверяет, что refreshAuthorization сбрасывает внешний токен и сохраняет новый.
+     *
+     * @return void
+     */
+    public function testClientCredentialsAuthorizationRefreshAuthorizationReplacesExternalToken(): void
+    {
+        $cache = new ArrayCache();
+        $cache->set('oauth:test', [
+            'access_token' => 'old-token',
+            'expires_at' => time() + 3600,
+        ], 3600);
+        $transport = new FakeTransport([new HttpResponse(200, [], '{"access_token":"new-token","expires_in":3600}')]);
+        $authorization = new ClientCredentialsAuthorizationStrategy(
+            'https://auth.example.test/token',
+            'client',
+            'secret',
+            tokenCache: $cache,
+            tokenCacheKey: 'oauth:test',
+        );
+
+        $authorization->refreshAuthorization($transport);
+
+        $cachedToken = $cache->get('oauth:test');
+        self::assertCount(1, $transport->requests);
+        self::assertIsArray($cachedToken);
+        self::assertSame('new-token', $cachedToken['access_token'] ?? null);
     }
 
     /**

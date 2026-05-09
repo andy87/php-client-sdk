@@ -301,7 +301,7 @@ use Andy87\PhpClientSdk\Auth\NullAuthorizationStrategy;
 $authorization = new NullAuthorizationStrategy();
 ```
 
-Используйте `ClientCredentialsAuthorizationStrategy` для OAuth `client_credentials`. Стратегия запрашивает access token через настроенный транспорт и кэширует его в памяти процесса до истечения срока действия.
+Используйте `ClientCredentialsAuthorizationStrategy` для OAuth `client_credentials`. Стратегия запрашивает access token через настроенный транспорт и кеширует его до истечения срока действия. По умолчанию токен хранится в памяти процесса.
 
 ```php
 <?php
@@ -318,6 +318,28 @@ $authorization = new ClientCredentialsAuthorizationStrategy(
     timeout: 30,
 );
 ```
+
+Передайте `CacheInterface`, если токен должен переживать текущий PHP-процесс. SDK поставляет `ArrayCache` для memory-сценариев и `SimpleCacheAdapter` для подключения PSR-16/simple-cache совместимых хранилищ без прямой зависимости пакета от конкретного фреймворка.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Andy87\PhpClientSdk\Auth\ClientCredentialsAuthorizationStrategy;
+use Andy87\PhpClientSdk\Cache\SimpleCacheAdapter;
+
+$authorization = new ClientCredentialsAuthorizationStrategy(
+    tokenUrl: 'https://auth.example.com/oauth/token',
+    clientId: 'client-id',
+    clientSecret: 'client-secret',
+    tokenCache: new SimpleCacheAdapter($psr16Cache),
+    tokenCacheKey: 'oauth:example:client-id',
+    clockSkew: 60,
+);
+```
+
+Во внешний кеш сохраняется массив с `access_token` и `expires_at`. `clockSkew` задаёт раннее обновление токена: при значении `60` стратегия перестанет использовать токен за 60 секунд до `expires_at`.
 
 `ClientCredentialsAuthorizationStrategy` обновляет cached token, если provider получил настроенный refresh status, по умолчанию `401`, и после этого provider один раз повторяет исходный запрос.
 

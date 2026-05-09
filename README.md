@@ -301,7 +301,7 @@ use Andy87\PhpClientSdk\Auth\NullAuthorizationStrategy;
 $authorization = new NullAuthorizationStrategy();
 ```
 
-Use `ClientCredentialsAuthorizationStrategy` for OAuth `client_credentials`. The strategy requests an access token through the configured transport and caches it in memory until it expires.
+Use `ClientCredentialsAuthorizationStrategy` for OAuth `client_credentials`. The strategy requests an access token through the configured transport and caches it until it expires. By default, the token is stored in process memory.
 
 ```php
 <?php
@@ -318,6 +318,28 @@ $authorization = new ClientCredentialsAuthorizationStrategy(
     timeout: 30,
 );
 ```
+
+Pass `CacheInterface` when the token must outlive the current PHP process. The SDK ships `ArrayCache` for memory scenarios and `SimpleCacheAdapter` for plugging in PSR-16/simple-cache compatible stores without adding a direct dependency on a concrete framework.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Andy87\PhpClientSdk\Auth\ClientCredentialsAuthorizationStrategy;
+use Andy87\PhpClientSdk\Cache\SimpleCacheAdapter;
+
+$authorization = new ClientCredentialsAuthorizationStrategy(
+    tokenUrl: 'https://auth.example.com/oauth/token',
+    clientId: 'client-id',
+    clientSecret: 'client-secret',
+    tokenCache: new SimpleCacheAdapter($psr16Cache),
+    tokenCacheKey: 'oauth:example:client-id',
+    clockSkew: 60,
+);
+```
+
+External cache payloads store `access_token` and `expires_at`. `clockSkew` controls early refresh: with `60`, the strategy stops using the token 60 seconds before `expires_at`.
 
 `ClientCredentialsAuthorizationStrategy` refreshes its cached token when a provider receives a configured refresh status, `401` by default, and then the provider retries the original request once.
 
