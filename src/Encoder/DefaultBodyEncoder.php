@@ -51,6 +51,18 @@ class DefaultBodyEncoder implements BodyEncoderInterface
             return $this->multipartEncoder->encode($body, $contentType);
         }
 
+        if (in_array($mediaType, ['application/octet-stream', 'text/plain', 'application/xml', 'text/xml'], true)) {
+            if ($body === null) {
+                return new HttpBody();
+            }
+
+            if (!is_string($body)) {
+                throw new \InvalidArgumentException(sprintf('Body for "%s" must be a string.', $mediaType));
+            }
+
+            return new HttpBody($body, $contentType);
+        }
+
         return $this->jsonEncoder->encode($body, $contentType);
     }
 

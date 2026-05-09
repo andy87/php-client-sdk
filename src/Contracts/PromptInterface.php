@@ -52,11 +52,18 @@ interface PromptInterface
     public function getQueryParameters(): array;
 
     /**
+     * Возвращает header-параметры запроса.
+     *
+     * @return array<string, mixed>
+     */
+    public function getHeaderParameters(): array;
+
+    /**
      * Возвращает тело запроса.
      *
-     * @return array<string, mixed>|list<mixed>|null
+     * @return array<string, mixed>|list<mixed>|string|null
      */
-    public function getBody(): array|null;
+    public function getBody(): array|string|null;
 
     /**
      * Проверяет обязательные поля запроса.

@@ -35,11 +35,20 @@ abstract class AbstractPrompt implements PromptInterface
     /** @var list<string> PHP-свойства query-параметров. */
     protected const QUERY_FIELDS = [];
 
+    /** @var list<string> PHP-свойства header-параметров. */
+    protected const HEADER_FIELDS = [];
+
     /** @var list<string> PHP-свойства тела запроса. */
     protected const BODY_FIELDS = [];
 
+    /** @var string|null PHP-свойство, которое является телом запроса целиком. */
+    protected const BODY_ROOT_FIELD = null;
+
     /** @var string|null Content-Type тела запроса. */
     protected const CONTENT_TYPE = null;
+
+    /** @var array<string, array{style?:string,explode?:bool}> Правила кодирования OpenAPI query-параметров по API-именам. */
+    protected const QUERY_PARAMETER_STYLES = [];
 
     /** @var bool Нужно ли добавлять авторизацию к запросу. */
     protected const AUTHORIZATION_REQUIRED = true;
@@ -143,17 +152,51 @@ abstract class AbstractPrompt implements PromptInterface
     }
 
     /**
+     * Возвращает header-параметры.
+     *
+     * @return array<string, mixed>
+     */
+    public function getHeaderParameters(): array
+    {
+        return $this->collect(static::HEADER_FIELDS);
+    }
+
+    /**
      * Возвращает тело запроса.
      *
-     * @return array<string, mixed>|list<mixed>|null
+     * @return array<string, mixed>|list<mixed>|string|null
      */
-    public function getBody(): array|null
+    public function getBody(): array|string|null
     {
+        if (static::BODY_ROOT_FIELD !== null) {
+            if (!$this->isPropertyInitialized(static::BODY_ROOT_FIELD)) {
+                return null;
+            }
+
+            $value = $this->{static::BODY_ROOT_FIELD};
+
+            if ($value === null) {
+                return null;
+            }
+
+            return $this->normalize($value);
+        }
+
         if (static::BODY_FIELDS === []) {
             return null;
         }
 
         return $this->collect(static::BODY_FIELDS);
+    }
+
+    /**
+     * Возвращает OpenAPI-правила кодирования query-параметров.
+     *
+     * @return array<string, array{style?:string,explode?:bool}> Правила по API-именам query-параметров.
+     */
+    public function getQueryParameterStyles(): array
+    {
+        return static::QUERY_PARAMETER_STYLES;
     }
 
     /**

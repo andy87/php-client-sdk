@@ -43,7 +43,10 @@ class DefaultRequestFinalizer implements RequestFinalizerInterface
      */
     public function finalize(HttpRequest $request): HttpRequest
     {
-        $request->metadata['queryString'] = $this->queryEncoder->encode($request->query);
+        $request->metadata['queryString'] = $this->encodeQuery(
+            $request->query,
+            is_array($request->metadata['queryParameterStyles'] ?? null) ? $request->metadata['queryParameterStyles'] : [],
+        );
         $request->headers = HeaderUtils::merge([], $request->headers);
 
         if ($request->body !== null) {
@@ -65,5 +68,25 @@ class DefaultRequestFinalizer implements RequestFinalizerInterface
         }
 
         return $request;
+    }
+
+    /**
+     * Кодирует query-параметры с учётом OpenAPI style/explode, если encoder это поддерживает.
+     *
+     * @param array<string, mixed> $query Query-параметры.
+     * @param array<string, mixed> $styles Правила кодирования по API-именам.
+     *
+     * @return string Query-string или пустая строка.
+     */
+    private function encodeQuery(array $query, array $styles): string
+    {
+        if (method_exists($this->queryEncoder, 'encodeWithStyles')) {
+            /** @var callable(array<string, mixed>, array<string, mixed>): string $encoder */
+            $encoder = [$this->queryEncoder, 'encodeWithStyles'];
+
+            return $encoder($query, $styles);
+        }
+
+        return $this->queryEncoder->encode($query);
     }
 }

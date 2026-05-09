@@ -6,6 +6,7 @@ namespace Andy87\ClientsBase\Decoder;
 
 use Andy87\ClientsBase\Contracts\ResponseDecoderInterface;
 use Andy87\ClientsBase\Exception\ResponseDecodeException;
+use Andy87\ClientsBase\Http\HeaderUtils;
 use Andy87\ClientsBase\Http\HttpResponse;
 
 /**
@@ -28,6 +29,10 @@ class JsonResponseDecoder implements ResponseDecoderInterface
             return [];
         }
 
+        if (!$this->isJsonResponse($response)) {
+            return [];
+        }
+
         try {
             $data = json_decode($response->body, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $exception) {
@@ -47,5 +52,32 @@ class JsonResponseDecoder implements ResponseDecoderInterface
         }
 
         return $data;
+    }
+
+    /**
+     * Проверяет, что ответ заявлен как JSON.
+     *
+     * @param HttpResponse $response Raw HTTP-ответ.
+     *
+     * @return bool true, если Content-Type является JSON или отсутствует.
+     */
+    private function isJsonResponse(HttpResponse $response): bool
+    {
+        $contentType = null;
+
+        foreach ($response->headers as $name => $value) {
+            if (strtolower(HeaderUtils::normalizeName($name)) === 'content-type') {
+                $contentType = HeaderUtils::normalizeValue($value);
+                break;
+            }
+        }
+
+        if ($contentType === null || trim($contentType) === '') {
+            return true;
+        }
+
+        $mediaType = strtolower(trim(explode(';', $contentType, 2)[0]));
+
+        return $mediaType === 'application/json' || str_ends_with($mediaType, '+json');
     }
 }

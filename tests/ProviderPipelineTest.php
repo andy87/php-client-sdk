@@ -213,6 +213,25 @@ class ProviderPipelineTest extends TestCase
     }
 
     /**
+     * Проверяет, что Prompt DTO может добавлять HTTP header-параметры в запрос.
+     *
+     * @return void
+     */
+    public function testPromptHeaderParametersAreMergedIntoRequestHeaders(): void
+    {
+        $transport = new FakeTransport([new HttpResponse(200, [], '{"id":1}')]);
+        $provider = new TestProvider('https://api.example.test', new NullAuthorizationStrategy(), $transport);
+
+        $provider->call(new CreateUserPrompt([
+            'name' => 'Ivan',
+            'requestSource' => 'crm',
+        ]), UserResponse::class);
+
+        self::assertSame('crm', $transport->requests[0]->headers['X-Request-Source']);
+        self::assertSame(['name' => 'Ivan'], $transport->requests[0]->body);
+    }
+
+    /**
      * Проверяет, что HTTP-ошибка возвращается как Response с ApiError.
      *
      * @return void
@@ -770,6 +789,100 @@ class ProviderPipelineTest extends TestCase
             'https://api.example.test/search?q=a%20b',
             $buildUrl->invoke($transport, 'https://api.example.test/search', ['q' => 'a b']),
         );
+    }
+
+    /**
+     * Проверяет, что root body Prompt отправляет значение тела целиком, а не оборачивает его в поле.
+     *
+     * @return void
+     *
+     * @throws \RuntimeException Если request pipeline завершился ошибкой.
+     */
+    public function testRootBodyPromptSendsBodyValueDirectly(): void
+    {
+        $transport = new FakeTransport([new HttpResponse(200, ['Content-Type' => 'application/json'], '{}')]);
+        $provider = new TestProvider('https://api.example.test', new NullAuthorizationStrategy(), $transport);
+        $responseClass = get_class(new class extends AbstractResponse {
+        });
+
+        $provider->call(new class(['body' => ['ids' => [1, 2]]]) extends AbstractPrompt {
+            protected const METHOD = 'POST';
+            protected const ENDPOINT = '/bulk';
+            protected const CONTENT_TYPE = 'application/json';
+            protected const FIELD_MAP = ['body' => 'body'];
+            protected const REQUIRED_FIELDS = ['body'];
+            protected const BODY_ROOT_FIELD = 'body';
+
+            /** @var array<string, mixed> Тело запроса целиком. */
+            public array $body;
+        }, $responseClass);
+
+        self::assertSame(['ids' => [1, 2]], $transport->requests[0]->body);
+        self::assertSame('{"ids":[1,2]}', $transport->requests[0]->rawBody);
+    }
+
+    /**
+     * Проверяет OpenAPI form/explode кодирование массивов query-параметров.
+     *
+     * @return void
+     *
+     * @throws \RuntimeException Если request pipeline завершился ошибкой.
+     */
+    public function testQueryParameterStylesEncodeExplodedArrays(): void
+    {
+        $transport = new FakeTransport([new HttpResponse(200, ['Content-Type' => 'application/json'], '{}')]);
+        $provider = new TestProvider('https://api.example.test', new NullAuthorizationStrategy(), $transport);
+        $responseClass = get_class(new class extends AbstractResponse {
+        });
+
+        $provider->call(new class(['ids' => [10, 20]]) extends AbstractPrompt {
+            protected const METHOD = 'GET';
+            protected const ENDPOINT = '/items';
+            protected const FIELD_MAP = ['ids' => 'ids'];
+            protected const QUERY_FIELDS = ['ids'];
+            protected const QUERY_PARAMETER_STYLES = ['ids' => ['style' => 'form', 'explode' => true]];
+
+            /** @var array<int, int> Идентификаторы сущностей. */
+            public array $ids;
+        }, $responseClass);
+
+        self::assertSame('ids=10&ids=20', $transport->requests[0]->metadata['queryString']);
+    }
+
+    /**
+     * Проверяет raw body для application/octet-stream.
+     *
+     * @return void
+     */
+    public function testBodyEncoderSupportsOctetStreamRawBody(): void
+    {
+        $body = (new DefaultBodyEncoder())->encode('raw-bytes', 'application/octet-stream');
+
+        self::assertSame('raw-bytes', $body->content);
+        self::assertSame('application/octet-stream', $body->contentType);
+    }
+
+    /**
+     * Проверяет, что успешный non-JSON ответ сохраняется как rawBody без ошибки декодирования.
+     *
+     * @return void
+     *
+     * @throws \RuntimeException Если request pipeline завершился ошибкой.
+     */
+    public function testSuccessfulNonJsonResponseKeepsRawBody(): void
+    {
+        $transport = new FakeTransport([new HttpResponse(200, ['Content-Type' => 'application/pdf'], '%PDF-1.4')]);
+        $provider = new TestProvider('https://api.example.test', new NullAuthorizationStrategy(), $transport);
+        $responseClass = get_class(new class extends AbstractResponse {
+        });
+
+        $response = $provider->call(new class extends AbstractPrompt {
+            protected const METHOD = 'GET';
+            protected const ENDPOINT = '/document.pdf';
+        }, $responseClass);
+
+        self::assertSame('%PDF-1.4', $response->getRawBody());
+        self::assertSame([], $response->getDecodedBody());
     }
 
     /**

@@ -56,9 +56,11 @@ class DefaultRequestFactory implements RequestFactoryInterface
     ): HttpRequest {
         $endpoint = $this->buildEndpoint($prompt);
         $query = array_merge($prompt->getQueryParameters(), $extraQuery);
-        $queryString = $this->queryEncoder->encode($query);
+        $queryStyles = $this->getQueryParameterStyles($prompt);
+        $queryString = $this->encodeQuery($query, $queryStyles);
         $url = rtrim($baseUrl, '/') . '/' . ltrim($endpoint, '/');
         $body = $prompt->getBody();
+        $headers = HeaderUtils::merge($headers, $prompt->getHeaderParameters());
 
         $encodedBody = $this->bodyEncoder->encode($body, $prompt->getContentType());
         $headers = HeaderUtils::merge($headers, $encodedBody->headers);
@@ -78,6 +80,7 @@ class DefaultRequestFactory implements RequestFactoryInterface
             rawBody: $encodedBody->content,
             metadata: [
                 'queryString' => $queryString,
+                'queryParameterStyles' => $queryStyles,
                 'promptClass' => $prompt::class,
                 'endpoint' => $prompt->getEndpoint(),
             ],
@@ -106,6 +109,44 @@ class DefaultRequestFactory implements RequestFactoryInterface
         }
 
         return $endpoint;
+    }
+
+    /**
+     * Кодирует query-параметры с учётом OpenAPI style/explode, если encoder это поддерживает.
+     *
+     * @param array<string, mixed> $query Query-параметры.
+     * @param array<string, array{style?:string,explode?:bool}> $styles Правила кодирования по API-именам.
+     *
+     * @return string Query-string или пустая строка.
+     */
+    private function encodeQuery(array $query, array $styles): string
+    {
+        if (method_exists($this->queryEncoder, 'encodeWithStyles')) {
+            /** @var callable(array<string, mixed>, array<string, array{style?:string,explode?:bool}>): string $encoder */
+            $encoder = [$this->queryEncoder, 'encodeWithStyles'];
+
+            return $encoder($query, $styles);
+        }
+
+        return $this->queryEncoder->encode($query);
+    }
+
+    /**
+     * Возвращает OpenAPI-правила кодирования query-параметров из Prompt DTO.
+     *
+     * @param PromptInterface $prompt DTO запроса.
+     *
+     * @return array<string, array{style?:string,explode?:bool}> Правила по API-именам query-параметров.
+     */
+    private function getQueryParameterStyles(PromptInterface $prompt): array
+    {
+        if (!method_exists($prompt, 'getQueryParameterStyles')) {
+            return [];
+        }
+
+        $styles = $prompt->getQueryParameterStyles();
+
+        return is_array($styles) ? $styles : [];
     }
 
 }

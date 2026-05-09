@@ -16,7 +16,7 @@ class HttpRequest
      * @param string $url Полный URL.
      * @param array<string, string> $headers Заголовки.
      * @param array<string, mixed> $query Query-параметры.
-     * @param array<string, mixed>|list<mixed>|null $body Тело запроса.
+     * @param array<string, mixed>|list<mixed>|string|null $body Тело запроса.
      * @param string|null $contentType Content-Type тела.
      * @param int $timeout Таймаут в секундах.
      * @param string|null $rawBody Уже закодированное тело запроса.
@@ -29,7 +29,7 @@ class HttpRequest
         public string $url,
         public array $headers = [],
         public array $query = [],
-        public array|null $body = null,
+        public array|string|null $body = null,
         public ?string $contentType = null,
         public int $timeout = 30,
         public ?string $rawBody = null,

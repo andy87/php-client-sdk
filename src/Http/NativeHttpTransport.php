@@ -48,7 +48,9 @@ class NativeHttpTransport implements HttpTransportInterface
         if ($request->rawBody !== null) {
             $body = $request->rawBody;
         } elseif ($request->body !== null) {
-            if ($this->mediaType($request->contentType) === 'application/x-www-form-urlencoded') {
+            if (is_string($request->body)) {
+                $body = $request->body;
+            } elseif ($this->mediaType($request->contentType) === 'application/x-www-form-urlencoded') {
                 $body = http_build_query($request->body);
             } else {
                 $body = json_encode($request->body, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
