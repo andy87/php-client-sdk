@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Decoder;
+namespace and_y87\PhpClientSdk\Decoder;
 
-use Andy87\PhpClientSdk\Contracts\ResponseDecoderInterface;
-use Andy87\PhpClientSdk\Exception\ResponseDecodeException;
-use Andy87\PhpClientSdk\Http\HeaderUtils;
-use Andy87\PhpClientSdk\Http\HttpResponse;
+use and_y87\PhpClientSdk\Contracts\ResponseDecoderInterface;
+use and_y87\PhpClientSdk\Exception\ResponseDecodeException;
+use and_y87\PhpClientSdk\Http\HeaderUtils;
+use and_y87\PhpClientSdk\Http\HttpResponse;
 
 /**
  * Декодирует JSON-ответы API.

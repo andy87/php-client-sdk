@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Prompt;
+namespace and_y87\PhpClientSdk\Prompt;
 
-use Andy87\PhpClientSdk\Contracts\PromptInterface;
+use and_y87\PhpClientSdk\Contracts\PromptInterface;
 
 /**
  * Базовый DTO запроса с гидрацией и разбором path/query/body-полей.

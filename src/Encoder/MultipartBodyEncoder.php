@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Encoder;
+namespace and_y87\PhpClientSdk\Encoder;
 
-use Andy87\PhpClientSdk\Contracts\BodyEncoderInterface;
-use Andy87\PhpClientSdk\Http\HeaderUtils;
-use Andy87\PhpClientSdk\Http\HttpBody;
-use Andy87\PhpClientSdk\Http\MultipartFile;
+use and_y87\PhpClientSdk\Contracts\BodyEncoderInterface;
+use and_y87\PhpClientSdk\Http\HeaderUtils;
+use and_y87\PhpClientSdk\Http\HttpBody;
+use and_y87\PhpClientSdk\Http\MultipartFile;
 
 /**
  * Кодирует тело HTTP-запроса в multipart/form-data.

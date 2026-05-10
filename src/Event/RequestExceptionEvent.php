@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Event;
+namespace and_y87\PhpClientSdk\Event;
 
-use Andy87\PhpClientSdk\Contracts\PromptInterface;
-use Andy87\PhpClientSdk\Http\HttpRequest;
-use Andy87\PhpClientSdk\Provider\AbstractProvider;
+use and_y87\PhpClientSdk\Contracts\PromptInterface;
+use and_y87\PhpClientSdk\Http\HttpRequest;
+use and_y87\PhpClientSdk\Provider\AbstractProvider;
 
 /**
  * Описывает событие ошибки во время выполнения HTTP-запроса.

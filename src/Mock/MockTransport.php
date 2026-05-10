@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Mock;
+namespace and_y87\PhpClientSdk\Mock;
 
-use Andy87\PhpClientSdk\Contracts\HttpTransportInterface;
-use Andy87\PhpClientSdk\Exception\TransportException;
-use Andy87\PhpClientSdk\Http\HttpRequest;
-use Andy87\PhpClientSdk\Http\HttpResponse;
+use and_y87\PhpClientSdk\Contracts\HttpTransportInterface;
+use and_y87\PhpClientSdk\Exception\TransportException;
+use and_y87\PhpClientSdk\Http\HttpRequest;
+use and_y87\PhpClientSdk\Http\HttpResponse;
 
 /**
  * HTTP-транспорт для mock-режима, возвращающий заранее подготовленные ответы без сетевых запросов.

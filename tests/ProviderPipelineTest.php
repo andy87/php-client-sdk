@@ -2,41 +2,41 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Tests;
+namespace and_y87\PhpClientSdk\Tests;
 
-use Andy87\PhpClientSdk\Auth\ApiKeyAuthorizationStrategy;
-use Andy87\PhpClientSdk\Auth\ClientCredentialsAuthorizationStrategy;
-use Andy87\PhpClientSdk\Auth\NullAuthorizationStrategy;
-use Andy87\PhpClientSdk\Auth\PromptClassAuthorizationStrategyResolver;
-use Andy87\PhpClientSdk\Cache\ArrayCache;
-use Andy87\PhpClientSdk\Config\BaseUrl;
-use Andy87\PhpClientSdk\Config\ClientOptions;
-use Andy87\PhpClientSdk\Dto\ApiError;
-use Andy87\PhpClientSdk\Exception\AuthorizationException;
-use Andy87\PhpClientSdk\Exception\ResponseDecodeException;
-use Andy87\PhpClientSdk\Exception\ResponseHydrationException;
-use Andy87\PhpClientSdk\Exception\TransportException;
-use Andy87\PhpClientSdk\Exception\ValidationException;
-use Andy87\PhpClientSdk\Encoder\DefaultBodyEncoder;
-use Andy87\PhpClientSdk\Encoder\MultipartBodyEncoder;
-use Andy87\PhpClientSdk\Event\ClientEvents;
-use Andy87\PhpClientSdk\Http\MultipartFile;
-use Andy87\PhpClientSdk\Http\HttpResponse;
-use Andy87\PhpClientSdk\Http\HttpRequest;
-use Andy87\PhpClientSdk\Http\NativeHttpTransport;
-use Andy87\PhpClientSdk\Mock\CallbackMockResponseResolver;
-use Andy87\PhpClientSdk\Mock\CompositeMockResponseResolver;
-use Andy87\PhpClientSdk\Mock\MockTransport;
-use Andy87\PhpClientSdk\Mock\RouteMockResponseResolver;
-use Andy87\PhpClientSdk\Prompt\AbstractPrompt;
-use Andy87\PhpClientSdk\Request\DefaultRequestFactory;
-use Andy87\PhpClientSdk\Response\AbstractResponse;
-use Andy87\PhpClientSdk\Retry\DefaultRetryPolicy;
-use Andy87\PhpClientSdk\Tests\Support\CreateUserPrompt;
-use Andy87\PhpClientSdk\Tests\Support\FakeTransport;
-use Andy87\PhpClientSdk\Tests\Support\GetUserPrompt;
-use Andy87\PhpClientSdk\Tests\Support\TestProvider;
-use Andy87\PhpClientSdk\Tests\Support\UserResponse;
+use and_y87\PhpClientSdk\Auth\ApiKeyAuthorizationStrategy;
+use and_y87\PhpClientSdk\Auth\ClientCredentialsAuthorizationStrategy;
+use and_y87\PhpClientSdk\Auth\NullAuthorizationStrategy;
+use and_y87\PhpClientSdk\Auth\PromptClassAuthorizationStrategyResolver;
+use and_y87\PhpClientSdk\Cache\ArrayCache;
+use and_y87\PhpClientSdk\Config\BaseUrl;
+use and_y87\PhpClientSdk\Config\ClientOptions;
+use and_y87\PhpClientSdk\Dto\ApiError;
+use and_y87\PhpClientSdk\Exception\AuthorizationException;
+use and_y87\PhpClientSdk\Exception\ResponseDecodeException;
+use and_y87\PhpClientSdk\Exception\ResponseHydrationException;
+use and_y87\PhpClientSdk\Exception\TransportException;
+use and_y87\PhpClientSdk\Exception\ValidationException;
+use and_y87\PhpClientSdk\Encoder\DefaultBodyEncoder;
+use and_y87\PhpClientSdk\Encoder\MultipartBodyEncoder;
+use and_y87\PhpClientSdk\Event\ClientEvents;
+use and_y87\PhpClientSdk\Http\MultipartFile;
+use and_y87\PhpClientSdk\Http\HttpResponse;
+use and_y87\PhpClientSdk\Http\HttpRequest;
+use and_y87\PhpClientSdk\Http\NativeHttpTransport;
+use and_y87\PhpClientSdk\Mock\CallbackMockResponseResolver;
+use and_y87\PhpClientSdk\Mock\CompositeMockResponseResolver;
+use and_y87\PhpClientSdk\Mock\MockTransport;
+use and_y87\PhpClientSdk\Mock\RouteMockResponseResolver;
+use and_y87\PhpClientSdk\Prompt\AbstractPrompt;
+use and_y87\PhpClientSdk\Request\DefaultRequestFactory;
+use and_y87\PhpClientSdk\Response\AbstractResponse;
+use and_y87\PhpClientSdk\Retry\DefaultRetryPolicy;
+use and_y87\PhpClientSdk\Tests\Support\CreateUserPrompt;
+use and_y87\PhpClientSdk\Tests\Support\FakeTransport;
+use and_y87\PhpClientSdk\Tests\Support\GetUserPrompt;
+use and_y87\PhpClientSdk\Tests\Support\TestProvider;
+use and_y87\PhpClientSdk\Tests\Support\UserResponse;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -1025,7 +1025,7 @@ class ProviderPipelineTest extends TestCase
 
         new class(['id' => 1]) extends AbstractResponse {
             /** @phpstan-ignore-next-line Intentionally invalid class-string for runtime validation. */
-            protected const MODEL = 'Andy87\\PhpClientSdk\\Tests\\MissingResponseModel';
+            protected const MODEL = 'and_y87\\PhpClientSdk\\Tests\\MissingResponseModel';
         };
     }
 

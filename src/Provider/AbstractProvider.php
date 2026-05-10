@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Provider;
+namespace and_y87\PhpClientSdk\Provider;
 
-use Andy87\PhpClientSdk\Config\ClientOptions;
-use Andy87\PhpClientSdk\Contracts\AuthorizationQueryStrategyInterface;
-use Andy87\PhpClientSdk\Contracts\AuthorizationStrategyInterface;
-use Andy87\PhpClientSdk\Contracts\HttpTransportInterface;
-use Andy87\PhpClientSdk\Contracts\PromptInterface;
-use Andy87\PhpClientSdk\Contracts\RefreshableAuthorizationStrategyInterface;
-use Andy87\PhpClientSdk\Contracts\ResponseInterface;
-use Andy87\PhpClientSdk\Event\AfterRequestEvent;
-use Andy87\PhpClientSdk\Event\BeforeRequestEvent;
-use Andy87\PhpClientSdk\Event\ClientEvents;
-use Andy87\PhpClientSdk\Event\RequestExceptionEvent;
-use Andy87\PhpClientSdk\Http\HttpRequest;
-use Andy87\PhpClientSdk\Http\HttpResponse;
-use Andy87\PhpClientSdk\Exception\ResponseHydrationException;
-use Andy87\PhpClientSdk\Runtime\ClientRuntime;
+use and_y87\PhpClientSdk\Config\ClientOptions;
+use and_y87\PhpClientSdk\Contracts\AuthorizationQueryStrategyInterface;
+use and_y87\PhpClientSdk\Contracts\AuthorizationStrategyInterface;
+use and_y87\PhpClientSdk\Contracts\HttpTransportInterface;
+use and_y87\PhpClientSdk\Contracts\PromptInterface;
+use and_y87\PhpClientSdk\Contracts\RefreshableAuthorizationStrategyInterface;
+use and_y87\PhpClientSdk\Contracts\ResponseInterface;
+use and_y87\PhpClientSdk\Event\AfterRequestEvent;
+use and_y87\PhpClientSdk\Event\BeforeRequestEvent;
+use and_y87\PhpClientSdk\Event\ClientEvents;
+use and_y87\PhpClientSdk\Event\RequestExceptionEvent;
+use and_y87\PhpClientSdk\Http\HttpRequest;
+use and_y87\PhpClientSdk\Http\HttpResponse;
+use and_y87\PhpClientSdk\Exception\ResponseHydrationException;
+use and_y87\PhpClientSdk\Runtime\ClientRuntime;
 
 /**
  * Базовый provider для вызова API-методов через Prompt и Response DTO.

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Prompt;
+namespace and_y87\PhpClientSdk\Prompt;
 
-use Andy87\PhpClientSdk\Contracts\AuthorizationProfilePromptInterface;
+use and_y87\PhpClientSdk\Contracts\AuthorizationProfilePromptInterface;
 
 /**
  * Базовый Prompt DTO для приватных API endpoints с профилем авторизации.

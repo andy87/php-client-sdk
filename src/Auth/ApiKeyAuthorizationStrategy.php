@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Auth;
+namespace and_y87\PhpClientSdk\Auth;
 
-use Andy87\PhpClientSdk\Contracts\AuthorizationQueryStrategyInterface;
-use Andy87\PhpClientSdk\Contracts\AuthorizationStrategyInterface;
-use Andy87\PhpClientSdk\Contracts\HttpTransportInterface;
+use and_y87\PhpClientSdk\Contracts\AuthorizationQueryStrategyInterface;
+use and_y87\PhpClientSdk\Contracts\AuthorizationStrategyInterface;
+use and_y87\PhpClientSdk\Contracts\HttpTransportInterface;
 
 /**
  * Добавляет API key в header или query-параметр.

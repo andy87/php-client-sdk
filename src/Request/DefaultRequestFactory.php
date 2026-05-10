@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Request;
+namespace and_y87\PhpClientSdk\Request;
 
-use Andy87\PhpClientSdk\Contracts\BodyEncoderInterface;
-use Andy87\PhpClientSdk\Contracts\PromptInterface;
-use Andy87\PhpClientSdk\Contracts\QueryEncoderInterface;
-use Andy87\PhpClientSdk\Contracts\RequestFactoryInterface;
-use Andy87\PhpClientSdk\Encoder\DefaultBodyEncoder;
-use Andy87\PhpClientSdk\Encoder\DefaultQueryEncoder;
-use Andy87\PhpClientSdk\Exception\ValidationException;
-use Andy87\PhpClientSdk\Http\HeaderUtils;
-use Andy87\PhpClientSdk\Http\HttpRequest;
+use and_y87\PhpClientSdk\Contracts\BodyEncoderInterface;
+use and_y87\PhpClientSdk\Contracts\PromptInterface;
+use and_y87\PhpClientSdk\Contracts\QueryEncoderInterface;
+use and_y87\PhpClientSdk\Contracts\RequestFactoryInterface;
+use and_y87\PhpClientSdk\Encoder\DefaultBodyEncoder;
+use and_y87\PhpClientSdk\Encoder\DefaultQueryEncoder;
+use and_y87\PhpClientSdk\Exception\ValidationException;
+use and_y87\PhpClientSdk\Http\HeaderUtils;
+use and_y87\PhpClientSdk\Http\HttpRequest;
 
 /**
  * Создаёт HTTP-запрос из Prompt DTO.

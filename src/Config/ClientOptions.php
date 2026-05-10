@@ -2,24 +2,24 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Config;
+namespace and_y87\PhpClientSdk\Config;
 
-use Andy87\PhpClientSdk\Contracts\ApiErrorFactoryInterface;
-use Andy87\PhpClientSdk\Contracts\AuthorizationStrategyResolverInterface;
-use Andy87\PhpClientSdk\Contracts\BodyEncoderInterface;
-use Andy87\PhpClientSdk\Contracts\QueryEncoderInterface;
-use Andy87\PhpClientSdk\Contracts\RequestFactoryInterface;
-use Andy87\PhpClientSdk\Contracts\RequestFinalizerInterface;
-use Andy87\PhpClientSdk\Contracts\ResponseDecoderInterface;
-use Andy87\PhpClientSdk\Contracts\RetryPolicyInterface;
-use Andy87\PhpClientSdk\Decoder\JsonResponseDecoder;
-use Andy87\PhpClientSdk\Encoder\DefaultBodyEncoder;
-use Andy87\PhpClientSdk\Encoder\DefaultQueryEncoder;
-use Andy87\PhpClientSdk\Error\DefaultApiErrorFactory;
-use Andy87\PhpClientSdk\Http\HeaderUtils;
-use Andy87\PhpClientSdk\Request\DefaultRequestFinalizer;
-use Andy87\PhpClientSdk\Request\DefaultRequestFactory;
-use Andy87\PhpClientSdk\Retry\NoRetryPolicy;
+use and_y87\PhpClientSdk\Contracts\ApiErrorFactoryInterface;
+use and_y87\PhpClientSdk\Contracts\AuthorizationStrategyResolverInterface;
+use and_y87\PhpClientSdk\Contracts\BodyEncoderInterface;
+use and_y87\PhpClientSdk\Contracts\QueryEncoderInterface;
+use and_y87\PhpClientSdk\Contracts\RequestFactoryInterface;
+use and_y87\PhpClientSdk\Contracts\RequestFinalizerInterface;
+use and_y87\PhpClientSdk\Contracts\ResponseDecoderInterface;
+use and_y87\PhpClientSdk\Contracts\RetryPolicyInterface;
+use and_y87\PhpClientSdk\Decoder\JsonResponseDecoder;
+use and_y87\PhpClientSdk\Encoder\DefaultBodyEncoder;
+use and_y87\PhpClientSdk\Encoder\DefaultQueryEncoder;
+use and_y87\PhpClientSdk\Error\DefaultApiErrorFactory;
+use and_y87\PhpClientSdk\Http\HeaderUtils;
+use and_y87\PhpClientSdk\Request\DefaultRequestFinalizer;
+use and_y87\PhpClientSdk\Request\DefaultRequestFactory;
+use and_y87\PhpClientSdk\Retry\NoRetryPolicy;
 
 /**
  * Хранит настраиваемые параметры выполнения API-запросов.

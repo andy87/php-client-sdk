@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Tests;
+namespace and_y87\PhpClientSdk\Tests;
 
-use Andy87\PhpClientSdk\Config\ClientOptions;
-use Andy87\PhpClientSdk\Config\BaseUrl;
-use Andy87\PhpClientSdk\Decoder\JsonResponseDecoder;
-use Andy87\PhpClientSdk\Encoder\DefaultBodyEncoder;
-use Andy87\PhpClientSdk\Encoder\DefaultQueryEncoder;
-use Andy87\PhpClientSdk\Error\DefaultApiErrorFactory;
-use Andy87\PhpClientSdk\Http\HeaderUtils;
-use Andy87\PhpClientSdk\Request\DefaultRequestFinalizer;
-use Andy87\PhpClientSdk\Request\DefaultRequestFactory;
-use Andy87\PhpClientSdk\Retry\NoRetryPolicy;
+use and_y87\PhpClientSdk\Config\ClientOptions;
+use and_y87\PhpClientSdk\Config\BaseUrl;
+use and_y87\PhpClientSdk\Decoder\JsonResponseDecoder;
+use and_y87\PhpClientSdk\Encoder\DefaultBodyEncoder;
+use and_y87\PhpClientSdk\Encoder\DefaultQueryEncoder;
+use and_y87\PhpClientSdk\Error\DefaultApiErrorFactory;
+use and_y87\PhpClientSdk\Http\HeaderUtils;
+use and_y87\PhpClientSdk\Request\DefaultRequestFinalizer;
+use and_y87\PhpClientSdk\Request\DefaultRequestFactory;
+use and_y87\PhpClientSdk\Retry\NoRetryPolicy;
 use PHPUnit\Framework\TestCase;
 
 /**

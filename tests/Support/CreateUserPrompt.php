@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Tests\Support;
+namespace and_y87\PhpClientSdk\Tests\Support;
 
-use Andy87\PhpClientSdk\Prompt\AbstractPrompt;
+use and_y87\PhpClientSdk\Prompt\AbstractPrompt;
 
 /**
  * Тестовый Prompt DTO для проверки кодирования тела запроса.

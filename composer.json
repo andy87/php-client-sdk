@@ -5,12 +5,12 @@
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "Andy87\\PhpClientSdk\\": "src/"
+      "and_y87\\PhpClientSdk\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Andy87\\PhpClientSdk\\Tests\\": "tests/"
+      "and_y87\\PhpClientSdk\\Tests\\": "tests/"
     }
   },
   "require": {

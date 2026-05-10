@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Prompt;
+namespace and_y87\PhpClientSdk\Prompt;
 
 /**
  * Базовый Prompt DTO для публичных API endpoints без авторизации.

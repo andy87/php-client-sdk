@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Http;
+namespace and_y87\PhpClientSdk\Http;
 
 /**
  * Содержит общие операции с HTTP-заголовками без учёта регистра имени.

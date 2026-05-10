@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Tests\Support;
+namespace and_y87\PhpClientSdk\Tests\Support;
 
-use Andy87\PhpClientSdk\Response\AbstractResponse;
+use and_y87\PhpClientSdk\Response\AbstractResponse;
 
 /**
  * Тестовый Response DTO для проверки гидрации ответа.

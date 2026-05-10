@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Contracts;
+namespace and_y87\PhpClientSdk\Contracts;
 
 /**
  * Выбирает стратегию авторизации для конкретного Prompt DTO.

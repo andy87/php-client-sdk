@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Cache;
+namespace and_y87\PhpClientSdk\Cache;
 
-use Andy87\PhpClientSdk\Contracts\CacheInterface;
+use and_y87\PhpClientSdk\Contracts\CacheInterface;
 
 /**
  * Адаптирует PSR-16/simple-cache совместимый объект к CacheInterface без прямой Composer-зависимости.

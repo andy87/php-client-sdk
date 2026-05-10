@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Contracts;
+namespace and_y87\PhpClientSdk\Contracts;
 
-use Andy87\PhpClientSdk\Dto\ApiError;
-use Andy87\PhpClientSdk\Http\HttpResponse;
+use and_y87\PhpClientSdk\Dto\ApiError;
+use and_y87\PhpClientSdk\Http\HttpResponse;
 
 /**
  * Создаёт нормализованную ошибку API из HTTP-ответа.

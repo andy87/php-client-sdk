@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Contracts;
+namespace and_y87\PhpClientSdk\Contracts;
 
-use Andy87\PhpClientSdk\Http\HttpBody;
+use and_y87\PhpClientSdk\Http\HttpBody;
 
 /**
  * Кодирует тело HTTP-запроса перед отправкой транспортом.

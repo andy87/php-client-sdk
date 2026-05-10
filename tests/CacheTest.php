@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Andy87\PhpClientSdk\Tests;
+namespace and_y87\PhpClientSdk\Tests;
 
-use Andy87\PhpClientSdk\Cache\ArrayCache;
-use Andy87\PhpClientSdk\Cache\SimpleCacheAdapter;
+use and_y87\PhpClientSdk\Cache\ArrayCache;
+use and_y87\PhpClientSdk\Cache\SimpleCacheAdapter;
 use PHPUnit\Framework\TestCase;
 
 /**
