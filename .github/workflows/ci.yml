@@ -1,0 +1,32 @@
+name: php-client-sdk
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.1', '8.2', '8.3', '8.4']
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+
+      - run: composer install --no-interaction --prefer-dist
+      - run: composer validate --strict
+
+      - name: Guard vendor-neutral SDK boundary
+        run: |
+          if grep -RInE "Avito|ClientsAvito|developers\.avito|api\.avito|generate-avito" src tests README.md docs composer.json; then
+            echo "php-client-sdk must stay vendor-neutral and must not contain Avito-specific code or documentation."
+            exit 1
+          fi
+
+      - run: find src tests -name '*.php' -print0 | xargs -0 -n 1 php -l
+      - run: composer analyse
+      - run: composer test
