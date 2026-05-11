@@ -7,3 +7,5 @@
 AGENTS.md
 
 php-client-sdk.zip
+
+.php-cs-fixer.dist.php
