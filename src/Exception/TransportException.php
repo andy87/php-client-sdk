@@ -7,6 +7,4 @@ namespace and_y87\PhpClientSdk\Exception;
 /**
  * Описывает ошибку транспортного слоя HTTP-запроса.
  */
-class TransportException extends \RuntimeException
-{
-}
+class TransportException extends \RuntimeException {}

@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace and_y87\PhpClientSdk\Tests;
 
-use and_y87\PhpClientSdk\Auth\ApiKeyAuthorizationStrategy;
-use and_y87\PhpClientSdk\Auth\AuthorizationProfileStrategyResolver;
-use and_y87\PhpClientSdk\Auth\BearerTokenAuthorizationStrategy;
-use and_y87\PhpClientSdk\Auth\NullAuthorizationStrategy;
-use and_y87\PhpClientSdk\Config\ClientOptions;
-use and_y87\PhpClientSdk\Http\HttpResponse;
-use and_y87\PhpClientSdk\Prompt\AbstractPrompt;
-use and_y87\PhpClientSdk\Prompt\PrivatePrompt;
-use and_y87\PhpClientSdk\Prompt\PublicPrompt;
+use and_y87\PhpClientSdk\Security\Authorization\Strategy\ApiKeyAuthorizationStrategy;
+use and_y87\PhpClientSdk\Security\Authorization\Resolver\AuthorizationProfileStrategyResolver;
+use and_y87\PhpClientSdk\Security\Authorization\Strategy\BearerTokenAuthorizationStrategy;
+use and_y87\PhpClientSdk\Security\Authorization\Strategy\NullAuthorizationStrategy;
+use and_y87\PhpClientSdk\Client\Config\ClientOptions;
+use and_y87\PhpClientSdk\Transport\Http\HttpResponse;
+use and_y87\PhpClientSdk\Request\Prompt\AbstractPrompt;
+use and_y87\PhpClientSdk\Request\Prompt\PrivatePrompt;
+use and_y87\PhpClientSdk\Request\Prompt\PublicPrompt;
 use and_y87\PhpClientSdk\Tests\Support\FakeTransport;
 use and_y87\PhpClientSdk\Tests\Support\TestProvider;
 use and_y87\PhpClientSdk\Tests\Support\UserResponse;

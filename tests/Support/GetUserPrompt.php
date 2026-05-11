@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace and_y87\PhpClientSdk\Tests\Support;
 
-use and_y87\PhpClientSdk\Prompt\AbstractPrompt;
+use and_y87\PhpClientSdk\Request\Prompt\AbstractPrompt;
 
 /**
  * Тестовый Prompt DTO для проверки сборки запросов.

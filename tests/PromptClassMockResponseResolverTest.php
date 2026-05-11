@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace and_y87\PhpClientSdk\Tests;
 
-use and_y87\PhpClientSdk\Http\HttpRequest;
-use and_y87\PhpClientSdk\Http\HttpResponse;
-use and_y87\PhpClientSdk\Mock\PromptClassMockResponseResolver;
+use and_y87\PhpClientSdk\Transport\Http\HttpRequest;
+use and_y87\PhpClientSdk\Transport\Http\HttpResponse;
+use and_y87\PhpClientSdk\Testing\Mock\PromptClassMockResponseResolver;
 use and_y87\PhpClientSdk\Tests\Support\CreateUserPrompt;
 use and_y87\PhpClientSdk\Tests\Support\GetUserPrompt;
 use PHPUnit\Framework\TestCase;

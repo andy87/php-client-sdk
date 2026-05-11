@@ -4,34 +4,34 @@ declare(strict_types=1);
 
 namespace and_y87\PhpClientSdk\Tests;
 
-use and_y87\PhpClientSdk\Auth\ApiKeyAuthorizationStrategy;
-use and_y87\PhpClientSdk\Auth\ClientCredentialsAuthorizationStrategy;
-use and_y87\PhpClientSdk\Auth\NullAuthorizationStrategy;
-use and_y87\PhpClientSdk\Auth\PromptClassAuthorizationStrategyResolver;
-use and_y87\PhpClientSdk\Cache\ArrayCache;
-use and_y87\PhpClientSdk\Config\BaseUrl;
-use and_y87\PhpClientSdk\Config\ClientOptions;
-use and_y87\PhpClientSdk\Dto\ApiError;
+use and_y87\PhpClientSdk\Security\Authorization\Strategy\ApiKeyAuthorizationStrategy;
+use and_y87\PhpClientSdk\Security\Authorization\Strategy\ClientCredentialsAuthorizationStrategy;
+use and_y87\PhpClientSdk\Security\Authorization\Strategy\NullAuthorizationStrategy;
+use and_y87\PhpClientSdk\Security\Authorization\Resolver\PromptClassAuthorizationStrategyResolver;
+use and_y87\PhpClientSdk\Transport\Cache\ArrayCache;
+use and_y87\PhpClientSdk\Client\Config\BaseUrl;
+use and_y87\PhpClientSdk\Client\Config\ClientOptions;
+use and_y87\PhpClientSdk\Response\Error\ApiError;
 use and_y87\PhpClientSdk\Exception\AuthorizationException;
 use and_y87\PhpClientSdk\Exception\ResponseDecodeException;
 use and_y87\PhpClientSdk\Exception\ResponseHydrationException;
 use and_y87\PhpClientSdk\Exception\TransportException;
 use and_y87\PhpClientSdk\Exception\ValidationException;
-use and_y87\PhpClientSdk\Encoder\DefaultBodyEncoder;
-use and_y87\PhpClientSdk\Encoder\MultipartBodyEncoder;
-use and_y87\PhpClientSdk\Event\ClientEvents;
-use and_y87\PhpClientSdk\Http\MultipartFile;
-use and_y87\PhpClientSdk\Http\HttpResponse;
-use and_y87\PhpClientSdk\Http\HttpRequest;
-use and_y87\PhpClientSdk\Http\NativeHttpTransport;
-use and_y87\PhpClientSdk\Mock\CallbackMockResponseResolver;
-use and_y87\PhpClientSdk\Mock\CompositeMockResponseResolver;
-use and_y87\PhpClientSdk\Mock\MockTransport;
-use and_y87\PhpClientSdk\Mock\RouteMockResponseResolver;
-use and_y87\PhpClientSdk\Prompt\AbstractPrompt;
-use and_y87\PhpClientSdk\Request\DefaultRequestFactory;
-use and_y87\PhpClientSdk\Response\AbstractResponse;
-use and_y87\PhpClientSdk\Retry\DefaultRetryPolicy;
+use and_y87\PhpClientSdk\Request\Encoder\Body\DefaultBodyEncoder;
+use and_y87\PhpClientSdk\Request\Encoder\Body\MultipartBodyEncoder;
+use and_y87\PhpClientSdk\Client\Event\ClientEvents;
+use and_y87\PhpClientSdk\Transport\Http\MultipartFile;
+use and_y87\PhpClientSdk\Transport\Http\HttpResponse;
+use and_y87\PhpClientSdk\Transport\Http\HttpRequest;
+use and_y87\PhpClientSdk\Transport\Native\NativeHttpTransport;
+use and_y87\PhpClientSdk\Testing\Mock\CallbackMockResponseResolver;
+use and_y87\PhpClientSdk\Testing\Mock\CompositeMockResponseResolver;
+use and_y87\PhpClientSdk\Testing\Mock\MockTransport;
+use and_y87\PhpClientSdk\Testing\Mock\RouteMockResponseResolver;
+use and_y87\PhpClientSdk\Request\Prompt\AbstractPrompt;
+use and_y87\PhpClientSdk\Request\Factory\DefaultRequestFactory;
+use and_y87\PhpClientSdk\Response\Model\AbstractResponse;
+use and_y87\PhpClientSdk\Transport\Retry\DefaultRetryPolicy;
 use and_y87\PhpClientSdk\Tests\Support\CreateUserPrompt;
 use and_y87\PhpClientSdk\Tests\Support\FakeTransport;
 use and_y87\PhpClientSdk\Tests\Support\GetUserPrompt;
@@ -763,8 +763,7 @@ class ProviderPipelineTest extends TestCase
      */
     public function testPromptWithoutMethodConstantThrowsLogicException(): void
     {
-        $prompt = new class extends AbstractPrompt {
-        };
+        $prompt = new class extends AbstractPrompt {};
 
         $this->expectException(\LogicException::class);
 
@@ -783,7 +782,7 @@ class ProviderPipelineTest extends TestCase
 
         $this->expectException(ValidationException::class);
 
-        $provider->call(new class(['id' => 1]) extends GetUserPrompt {
+        $provider->call(new class (['id' => 1]) extends GetUserPrompt {
             protected const PATH_FIELDS = [];
         }, UserResponse::class);
     }
@@ -918,10 +917,9 @@ class ProviderPipelineTest extends TestCase
     {
         $transport = new FakeTransport([new HttpResponse(200, ['Content-Type' => 'application/json'], '{}')]);
         $provider = new TestProvider('https://api.example.test', new NullAuthorizationStrategy(), $transport);
-        $responseClass = get_class(new class extends AbstractResponse {
-        });
+        $responseClass = get_class(new class extends AbstractResponse {});
 
-        $provider->call(new class(['body' => ['ids' => [1, 2]]]) extends AbstractPrompt {
+        $provider->call(new class (['body' => ['ids' => [1, 2]]]) extends AbstractPrompt {
             protected const METHOD = 'POST';
             protected const ENDPOINT = '/bulk';
             protected const CONTENT_TYPE = 'application/json';
@@ -948,10 +946,9 @@ class ProviderPipelineTest extends TestCase
     {
         $transport = new FakeTransport([new HttpResponse(200, ['Content-Type' => 'application/json'], '{}')]);
         $provider = new TestProvider('https://api.example.test', new NullAuthorizationStrategy(), $transport);
-        $responseClass = get_class(new class extends AbstractResponse {
-        });
+        $responseClass = get_class(new class extends AbstractResponse {});
 
-        $provider->call(new class(['ids' => [10, 20]]) extends AbstractPrompt {
+        $provider->call(new class (['ids' => [10, 20]]) extends AbstractPrompt {
             protected const METHOD = 'GET';
             protected const ENDPOINT = '/items';
             protected const FIELD_MAP = ['ids' => 'ids'];
@@ -989,8 +986,7 @@ class ProviderPipelineTest extends TestCase
     {
         $transport = new FakeTransport([new HttpResponse(200, ['Content-Type' => 'application/pdf'], '%PDF-1.4')]);
         $provider = new TestProvider('https://api.example.test', new NullAuthorizationStrategy(), $transport);
-        $responseClass = get_class(new class extends AbstractResponse {
-        });
+        $responseClass = get_class(new class extends AbstractResponse {});
 
         $response = $provider->call(new class extends AbstractPrompt {
             protected const METHOD = 'GET';
@@ -1023,7 +1019,7 @@ class ProviderPipelineTest extends TestCase
     {
         $this->expectException(\LogicException::class);
 
-        new class(['id' => 1]) extends AbstractResponse {
+        new class (['id' => 1]) extends AbstractResponse {
             /** @phpstan-ignore-next-line Intentionally invalid class-string for runtime validation. */
             protected const MODEL = 'and_y87\\PhpClientSdk\\Tests\\MissingResponseModel';
         };

@@ -7,6 +7,4 @@ namespace and_y87\PhpClientSdk\Exception;
 /**
  * Описывает ошибку создания типизированного Response DTO.
  */
-class ResponseHydrationException extends \UnexpectedValueException
-{
-}
+class ResponseHydrationException extends \UnexpectedValueException {}

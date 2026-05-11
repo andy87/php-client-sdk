@@ -7,6 +7,4 @@ namespace and_y87\PhpClientSdk\Exception;
 /**
  * Описывает ошибку валидации Prompt DTO или собранного HTTP-запроса.
  */
-class ValidationException extends \InvalidArgumentException
-{
-}
+class ValidationException extends \InvalidArgumentException {}

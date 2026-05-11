@@ -1,0 +1,14 @@
+<?php
+
+declare(strict_types=1);
+
+namespace and_y87\PhpClientSdk\Request\Prompt;
+
+/**
+ * Базовый Prompt DTO для публичных API endpoints без авторизации.
+ */
+abstract class PublicPrompt extends AbstractPrompt
+{
+    /** @var bool Публичный endpoint не требует авторизацию. */
+    protected const AUTHORIZATION_REQUIRED = false;
+}

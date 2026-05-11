@@ -1,0 +1,155 @@
+<?php
+
+declare(strict_types=1);
+
+namespace and_y87\PhpClientSdk\Request\Encoder\Body;
+
+use and_y87\PhpClientSdk\Contracts\Encoding\BodyEncoderInterface;
+use and_y87\PhpClientSdk\Transport\Http\HeaderUtils;
+use and_y87\PhpClientSdk\Transport\Http\HttpBody;
+use and_y87\PhpClientSdk\Transport\Http\MultipartFile;
+
+/**
+ * Кодирует тело HTTP-запроса в multipart/form-data.
+ */
+class MultipartBodyEncoder implements BodyEncoderInterface
+{
+    /**
+     * Кодирует тело запроса в multipart/form-data.
+     *
+     * @param array<string, mixed>|list<mixed>|string|null $body Тело запроса.
+     * @param string|null $contentType Желаемый Content-Type.
+     *
+     * @return HttpBody Закодированное multipart-тело.
+     *
+     * @throws \InvalidArgumentException Если тело или файл некорректны.
+     */
+    public function encode(array|string|null $body, ?string $contentType): HttpBody
+    {
+        if ($body === null) {
+            return new HttpBody();
+        }
+
+        if (!is_array($body)) {
+            throw new \InvalidArgumentException('Multipart body must be an array.');
+        }
+
+        $boundary = $this->extractBoundary($contentType) ?? '----php-client-sdk-' . bin2hex(random_bytes(12));
+        $content = '';
+
+        foreach ($body as $name => $value) {
+            $content .= $this->encodePart((string) $name, $value, $boundary);
+        }
+
+        $content .= '--' . $boundary . "--\r\n";
+
+        return new HttpBody($content, 'multipart/form-data; boundary=' . $boundary);
+    }
+
+    /**
+     * Возвращает boundary из Content-Type, если он передан.
+     *
+     * @param string|null $contentType Content-Type запроса.
+     *
+     * @return string|null Boundary или null.
+     */
+    private function extractBoundary(?string $contentType): ?string
+    {
+        if ($contentType === null) {
+            return null;
+        }
+
+        foreach (explode(';', $contentType) as $part) {
+            $part = trim($part);
+
+            if (!str_starts_with(strtolower($part), 'boundary=')) {
+                continue;
+            }
+
+            $boundary = trim(substr($part, 9), " \t\n\r\0\x0B\"");
+
+            if ($boundary === '') {
+                return null;
+            }
+
+            return $this->validateBoundary($boundary);
+        }
+
+        return null;
+    }
+
+    /**
+     * Проверяет boundary multipart/form-data на безопасный формат.
+     *
+     * @param string $boundary Boundary multipart-запроса.
+     *
+     * @return string Проверенный boundary.
+     *
+     * @throws \InvalidArgumentException Если boundary содержит недопустимые символы.
+     */
+    private function validateBoundary(string $boundary): string
+    {
+        if (!preg_match('/^[A-Za-z0-9\'()+_,.\/:=?-]{1,70}$/', $boundary)) {
+            throw new \InvalidArgumentException('Multipart boundary contains invalid characters.');
+        }
+
+        return $boundary;
+    }
+
+    /**
+     * Кодирует одну часть multipart/form-data.
+     *
+     * @param string $name Имя поля.
+     * @param mixed $value Значение поля.
+     * @param string $boundary Boundary multipart-запроса.
+     *
+     * @return string Закодированная часть.
+     *
+     * @throws \InvalidArgumentException Если файл не читается.
+     */
+    private function encodePart(string $name, mixed $value, string $boundary): string
+    {
+        if ($value instanceof MultipartFile) {
+            if (!is_readable($value->path)) {
+                throw new \InvalidArgumentException(sprintf('Multipart file "%s" is not readable.', $value->path));
+            }
+
+            $filename = $value->filename ?? basename($value->path);
+
+            return '--' . $boundary . "\r\n"
+                . sprintf(
+                    'Content-Disposition: form-data; name="%s"; filename="%s"',
+                    $this->escapeHeaderParameter($name, 'Multipart field name'),
+                    $this->escapeHeaderParameter($filename, 'Multipart filename'),
+                ) . "\r\n"
+                . 'Content-Type: ' . HeaderUtils::normalizeValue($value->contentType) . "\r\n\r\n"
+                . file_get_contents($value->path) . "\r\n";
+        }
+
+        if (is_array($value)) {
+            $value = json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+        }
+
+        return '--' . $boundary . "\r\n"
+            . sprintf('Content-Disposition: form-data; name="%s"', $this->escapeHeaderParameter($name, 'Multipart field name')) . "\r\n\r\n"
+            . (string) $value . "\r\n";
+    }
+
+    /**
+     * Экранирует значение multipart-заголовка.
+     *
+     * @param string $value Значение.
+     *
+     * @return string Экранированное значение.
+     *
+     * @throws \InvalidArgumentException Если значение содержит CR или LF.
+     */
+    private function escapeHeaderParameter(string $value, string $label): string
+    {
+        if (str_contains($value, "\r") || str_contains($value, "\n")) {
+            throw new \InvalidArgumentException($label . ' must not contain CR or LF.');
+        }
+
+        return str_replace(['\\', '"'], ['\\\\', '\\"'], $value);
+    }
+}

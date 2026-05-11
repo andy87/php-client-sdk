@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace and_y87\PhpClientSdk\Tests;
 
-use and_y87\PhpClientSdk\Http\HttpRequest;
-use and_y87\PhpClientSdk\Http\HttpResponse;
-use and_y87\PhpClientSdk\Http\TraceableTransport;
+use and_y87\PhpClientSdk\Transport\Http\HttpRequest;
+use and_y87\PhpClientSdk\Transport\Http\HttpResponse;
+use and_y87\PhpClientSdk\Transport\Trace\TraceableTransport;
 use and_y87\PhpClientSdk\Tests\Support\FakeTransport;
 use PHPUnit\Framework\TestCase;
 

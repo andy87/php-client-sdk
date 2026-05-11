@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace and_y87\PhpClientSdk\Tests\Support;
 
-use and_y87\PhpClientSdk\Contracts\HttpTransportInterface;
-use and_y87\PhpClientSdk\Http\HttpRequest;
-use and_y87\PhpClientSdk\Http\HttpResponse;
+use and_y87\PhpClientSdk\Contracts\Http\HttpTransportInterface;
+use and_y87\PhpClientSdk\Transport\Http\HttpRequest;
+use and_y87\PhpClientSdk\Transport\Http\HttpResponse;
 
 /**
  * Тестовый HTTP-транспорт с очередью заранее заданных ответов.

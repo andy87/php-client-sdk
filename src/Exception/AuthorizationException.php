@@ -7,6 +7,4 @@ namespace and_y87\PhpClientSdk\Exception;
 /**
  * Описывает ошибку авторизации API-клиента.
  */
-class AuthorizationException extends \RuntimeException
-{
-}
+class AuthorizationException extends \RuntimeException {}

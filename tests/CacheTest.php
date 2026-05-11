@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace and_y87\PhpClientSdk\Tests;
 
-use and_y87\PhpClientSdk\Cache\ArrayCache;
-use and_y87\PhpClientSdk\Cache\SimpleCacheAdapter;
+use and_y87\PhpClientSdk\Transport\Cache\ArrayCache;
+use and_y87\PhpClientSdk\Transport\Cache\SimpleCacheAdapter;
 use PHPUnit\Framework\TestCase;
 
 /**

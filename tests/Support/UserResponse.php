@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace and_y87\PhpClientSdk\Tests\Support;
 
-use and_y87\PhpClientSdk\Response\AbstractResponse;
+use and_y87\PhpClientSdk\Response\Model\AbstractResponse;
 
 /**
  * Тестовый Response DTO для проверки гидрации ответа.
