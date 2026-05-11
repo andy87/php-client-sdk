@@ -3,3 +3,7 @@
 /.phpunit.cache/
 
 .idea/
+
+AGENTS.md
+
+php-client-sdk.zip
